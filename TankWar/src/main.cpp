@@ -55,6 +55,7 @@ int main()
 		//Draw the game
 		window.draw(game);
 
+	
         // Finally, display the rendered frame on screen
         window.display();
     }

@@ -1,6 +1,8 @@
 #include "game.h"
 
 
+
+
 Game::Game() // Constructor
 {
 	// Set Backgound
@@ -70,12 +72,25 @@ Game::Game() // Constructor
 
 	redScore = 0;
 	blueScore = 0;
-	}
 
-	Game::~Game(){}  // Destructor
+	
+	/*Create the grid with a size of the playing area. (780, 570)*/
+	gridObj = Grid(background.getPosition().x + background.getSize().x, background.getPosition().y + background.getSize().y); //The size of the playing area.
 
-	// Set a random Position which does not collide with anything
-	void Game::resetNpc()
+	/*Give the grid 10 columns and 10 rows. (can mismatch, but no point, better results when a square)*/
+	grid = gridObj.m_createGrid(10, 10);
+
+	/*Initialise the AI tank, giving it a starting Cell in the grid of [1][4]. Or the second column, fifth row.*/
+	player = AI(&grid[1][4]);
+
+	player.m_setCurrentCell(&grid[7][1]);
+
+}
+
+Game::~Game(){}  // Destructor
+
+// Set a random Position which does not collide with anything
+void Game::resetNpc()
 	{
 	bool collision = true;
 	while(collision)
@@ -161,8 +176,25 @@ void Game::resetPlayer()
 void Game::play()// Play the game for one timestep
 {
 	// Move tank
-	player.markPos();
+	//player.markPos();
 	player.move();
+
+
+	/*TEMPORARY CHECKING WHICH CELL THE AI IS IN.\
+		-Currently checking all of the grid, it isn't bad,
+		but can probably be made to just check if the AI
+		has reached its target Cell before doing any re-evaluation.
+	*/
+	for (int i = 0; i < grid.size(); i++)
+	{
+		for (int j = 0; j < grid[0].size(); j++)
+		{
+			if (player.isInCell(&grid[i][j]))
+			{
+				grid[i][j].setColour(sf::Color::Blue);
+			}
+		}
+	}
 
 	// Check for collisions
 	bool collision = false;
@@ -196,7 +228,7 @@ void Game::play()// Play the game for one timestep
 
 
 	// Move AI tank
-	npc.markPos();
+	//npc.markPos();
 	npc.move();
 	npc.implementMove();
 	if(npc.isFiring()){fireShell(npc.firingPosition(), true);}
@@ -238,17 +270,17 @@ void Game::play()// Play the game for one timestep
 	// Check if AI Tank can see anything
     for (list<Obstacle>::iterator it = redBuildings.begin(); it != redBuildings.end(); ++it)
     {
-	  if(npc.canSee(it->bb)) npc.markBase(Position((it->bb.getX1() + it->bb.getX2()) / 2.0f, (it->bb.getY1() + it->bb.getY2()) / 2.0f));
+	  //if(npc.canSee(it->bb)) npc.markBase(Position((it->bb.getX1() + it->bb.getX2()) / 2.0f, (it->bb.getY1() + it->bb.getY2()) / 2.0f));
     }
     for (list<Obstacle>::iterator it = blueBuildings.begin(); it != blueBuildings.end(); ++it)
     {
-	  if(npc.canSee(it->bb)) npc.markTarget(Position((it->bb.getX1() + it->bb.getX2()) / 2.0f, (it->bb.getY1() + it->bb.getY2()) / 2.0f));
+	  //if(npc.canSee(it->bb)) npc.markTarget(Position((it->bb.getX1() + it->bb.getX2()) / 2.0f, (it->bb.getY1() + it->bb.getY2()) / 2.0f));
     }
     for (list<Shell>::iterator it = shells.begin(); it != shells.end(); ++it)
     {
-	  if(npc.canSee(it->bb) && !it->isNpc()) npc.markShell(Position((it->bb.getX1() + it->bb.getX2()) / 2.0f, (it->bb.getY1() + it->bb.getY2()) / 2.0f));
+	  //if(npc.canSee(it->bb) && !it->isNpc()) npc.markShell(Position((it->bb.getX1() + it->bb.getX2()) / 2.0f, (it->bb.getY1() + it->bb.getY2()) / 2.0f));
     }
-	if(npc.canSee(player.bb)) npc.markEnemy(Position((player.bb.getX1() + player.bb.getX2()) / 2.0f, (player.bb.getY1() + player.bb.getY2()) / 2.0f ));
+	//if(npc.canSee(player.bb)) npc.markEnemy(Position((player.bb.getX1() + player.bb.getX2()) / 2.0f, (player.bb.getY1() + player.bb.getY2()) / 2.0f ));
 
 	// Move shells
 	for (list<Shell>::iterator it = shells.begin(); it != shells.end(); ++it){it->move();}
@@ -464,43 +496,64 @@ void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const// Draw 
 	// Draw scores
 	sf::Font font;
 	font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf");
+
 	char msg[255];
 	sprintf_s(msg,"%d", blueScore);
+
 	sf::Text drawingText(sf::String(msg),font,18);
 	drawingText.setColor(sf::Color::White);
-
 	drawingText.setPosition(250,577);
+
 	target.draw(drawingText);
 
 	sprintf_s(msg,"%d", redScore);
+
 	drawingText.setString(sf::String(msg));
 	drawingText.setPosition(550,577);
+
 	target.draw(drawingText);
 
 	// Draw game over
 	if(gameOver())
 	{
 		sprintf_s(msg,"GAME OVER", blueScore);
+
 		sf::Text drawingText(sf::String(msg),font,42);
 		drawingText.setPosition(300, 140);
+
 		target.draw(drawingText);
+
 		drawingText.setPosition(300, 240);
+
 		if(redScore > blueScore)
 		{
 			sprintf_s(msg,"RED WINS!", blueScore);
 			drawingText.setString(sf::String(msg));
 		}
+
 		if(redScore < blueScore)
 		{
 			sprintf_s(msg,"BLUE WINS!", blueScore);
 			drawingText.setString(sf::String(msg));
 		}
+
 		if(redScore == blueScore)
 		{
 			sprintf_s(msg,"MATCH DRAW!", blueScore);
 			drawingText.setString(sf::String(msg));
 		}
+
 		target.draw(drawingText);
+	}
+
+
+	/*Draw the Grid.*/
+	for (int i = 0; i < grid.size(); i++)
+	{
+		for (int j = 0; j < grid[0].size(); j++)
+		{
+			target.draw(grid[i][j]);
+		}
 	}
 }
      
@@ -529,7 +582,7 @@ void Game::keyPressed(sf::Keyboard::Key key)
 	   case	sf::Keyboard::Space :
 		   if(player.canFire())
 		   {
-			player.fire();
+			//player.fire();
 			fireShell(player.firingPosition(), false);
 		   }
 		   break;
