@@ -1,6 +1,9 @@
 #include "AI.h"
+#include <random>
 
-AI::AI() 
+
+
+AI::AI()
 {
 
 }
@@ -64,6 +67,7 @@ void AI::m_setCurrentCell(Cell * newCurrentCell)
 void AI::m_setEndCell(Cell * newEndCell)
 {
 	m_endCell = newEndCell;
+	m_endCell->setColour(sf::Color::Blue);
 }
 
 /*! Checks to see if this tank is currently inside of the given Cell.
@@ -83,12 +87,83 @@ void AI::reset()
 	forwards = true;
 }
 
+void AI::cleanup()
+{
+	for (int i = cellsToCheck.size(); i == 0; i--)
+	{
+		cellsToCheck.pop();
+	}
+
+	visitedCells.clear();
+}
+
+void AI::BreadthFirstSearch()
+{
+	if (!hasFoundEndCell)
+	{
+		cellsToCheck.push(m_currentCell); //Add current cell to queue.
+
+		m_currentCell->setColour(sf::Color::Yellow);
+
+		for (int i = 0; i < visitedCells.size(); i++)
+		{
+			if (m_currentCell == visitedCells.at(i)) //If current cell is in visitedCells
+			{
+				cellsToCheck.front()->setColour(sf::Color::Green);
+				cellsToCheck.pop(); //Pop front of queue.
+				m_currentCell = cellsToCheck.front(); //Set current cell to next Cell in queue.
+				i = 0; //Re-check if new current cell is in visitedCells.
+			}
+		}
+
+		//If current cell hasn't been visited already.
+
+		for (int i = 0; i < m_currentCell->m_neighbours->size(); i++)
+		{
+			/*Add all of the current cell's neighbours to the queue.*/
+			cellsToCheck.push(m_currentCell->m_neighbours->at(i));
+
+			m_currentCell->m_neighbours->at(i)->setColour(sf::Color::Yellow);
+		}
+
+		if (m_currentCell == m_endCell) //If current cell is our goal.
+		{
+			chooseNewEndCell = true;
+
+			x = rand() % 10;
+			y = rand() % 10;
+
+			//We win.
+			hasFoundEndCell = true;
+			m_previousEndCell = m_endCell;
+
+			m_currentCell->setColour(sf::Color::Magenta);
+
+			cleanup();
+			
+		}
+		else //If not
+		{
+			cellsToCheck.front()->setColour(sf::Color::White);
+
+			cellsToCheck.pop(); //Pop the front of the queue.
+			visitedCells.push_back(m_currentCell); //Add the current cell to visitedCells.
+
+			m_currentCell->setColour(sf::Color::Green);
+
+			m_currentCell = cellsToCheck.front(); //Set the current cell to the next item in the queue.
+		}
+	}
+}
+
+
 void AI::move()
 {
-	/*PUT CODE IN HERE TO TURN TO AND THEN MOVE TOWARDS THE CURRENTCELL.
-	
-	The code sets up the movement variables, and then calling implementMove() will
-	then start the movement itself.
+	BreadthFirstSearch();
+
+	/*
+		The code sets up the movement variables, and then calling implementMove() will
+		then start the movement itself.
 	*/
 
 	/*
@@ -98,37 +173,40 @@ void AI::move()
 		* Stop if reached desired Cell.
 	
 	*/
-	if (!hasFoundEndCell)
+	if (hasFoundEndCell)
 	{
 		if (!hasLocatedCell)
 		{
-
-
-			/*NEED TO WORK OUT THE ANGLE (not amount rotated [th]) THAT THE TANK IS FACING
-			AND THEN THE ANGLE FROM THE TANK THAT THE CURRENT CELL IS AND THEN ROTATE UNTIL
-			THOSE ANGLES ARE THE SAME, THEN MOVE FORWARD.*/
-
-
-			int tankX = getX();
+			//The x and y position of the tank in the game world.
+			int tankX = getX(); 
 			int tankY = getY();
-			int cellX = m_currentCell->m_realWorldPos.x;
-			int cellY = m_currentCell->m_realWorldPos.y;
 
+			//The x and y position of the current cell in the game world.
+			int cellX = m_previousEndCell->m_realWorldPos.x;
+			int cellY = m_previousEndCell->m_realWorldPos.y;
 
-			float angle = atan2(cellY - tankY, cellX - tankX);
-			
-			angle = RAD2DEG(angle);
+			//The angle the current cell is from the tank in degrees.
+			float cellAngleFromTank = RAD2DEG(atan2(cellY - tankY, cellX - tankX));
 
-			float currentRotation = RAD2DEG(atan2(tankY - firingPosition().getY(), tankX - firingPosition().getX()));
+			//The x and y direction the tank's turret is facing.
+			//Could have issue of tank trying to go forward to its turret but turrent is not the current forward dir.
+			//To solve, maybe put a point at the current forward dir that rotates /w the tank body.
+			int tankLookX = firingPosition().getX();
+			int tankLookY = firingPosition().getY();
 
-			std::cout << "Current Rotation: " << abs(currentRotation) << std::endl;
-			std::cout << "Angle to face: " << abs(angle) << std::endl;
+			float angleTankIsFacing = RAD2DEG(atan2(tankLookY - tankY, tankLookX - tankX));
 
-			if (abs(currentRotation) != abs(angle))
+			std::cout << "Angle Tank Is Facing: " << (int)angleTankIsFacing << std::endl;
+			std::cout << "Cell's Angle From Tank: " << (int)cellAngleFromTank << std::endl;
+
+			if ((int)angleTankIsFacing < (int)cellAngleFromTank)
 			{
 				goRight();
 			}
-			
+			else if ((int)angleTankIsFacing > (int)cellAngleFromTank)
+			{
+				goLeft();
+			}
 			else
 			{
 				hasLocatedCell = true;
@@ -138,10 +216,21 @@ void AI::move()
 		{
 			goForward();
 
-			if (isInCell(m_currentCell))
+			if (isInCell(m_previousEndCell))
 			{
 				stop();
-				hasFoundEndCell = true;
+
+				if (m_previousEndCell == m_endCell)
+				{
+					hasFoundEndCell = true;
+				}
+				else
+				{
+					hasLocatedCell = false;
+					hasFoundEndCell = false; //Temporarily set to true to avoid continued movement without re-evaluation.
+				}
+
+				
 			}
 		}
 	}

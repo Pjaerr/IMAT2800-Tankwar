@@ -10,9 +10,9 @@ Game::Game() // Constructor
 	background.setFillColor(sf::Color(40,70,20));
 	background.setPosition(10.0f,10.0f);
 
-	ammoArea.setSize(sf::Vector2f(800.0f,20.0f));
+	/*ammoArea.setSize(sf::Vector2f(800.0f,20.0f));
 	ammoArea.setFillColor(sf::Color(140,90,60));
-	ammoArea.setPosition(0.0f,580.0f);
+	ammoArea.setPosition(0.0f,580.0f);*/
 
 	// Seed pseudorandom num gen
 	srand ( (int) time(NULL) );
@@ -21,51 +21,51 @@ Game::Game() // Constructor
 	debugMode = false;
 
 	// Borders
-	obstacles.push_back(Obstacle(0.f,0.f,10.f,580.f,sf::Color(100,100,100)));
+	/*obstacles.push_back(Obstacle(0.f,0.f,10.f,580.f,sf::Color(100,100,100)));
 	obstacles.push_back(Obstacle(0.f,0.f,800.f,10.f,sf::Color(100,100,100)));
 	obstacles.push_back(Obstacle(0.f,570.f,800.f,580.f,sf::Color(100,100,100)));
-	obstacles.push_back(Obstacle(790.f,0.f,800.f,580.f,sf::Color(100,100,100)));
+	obstacles.push_back(Obstacle(790.f,0.f,800.f,580.f,sf::Color(100,100,100)));*/
 
 	float dx, dy;
 	// Top right
 	dx = (float) (rand() % 340 + 400);
 	dy = (float) (rand() % 200 + 10);
 
-	redBuildings.push_back(Obstacle(dx,dy,dx+20.f,dy+20.f,sf::Color(170,60,60)));
+	/*redBuildings.push_back(Obstacle(dx,dy,dx+20.f,dy+20.f,sf::Color(170,60,60)));
 	redBuildings.push_back(Obstacle(dx+20.f,dy,dx+40.f,dy+20.f,sf::Color(170,40,40)));
 	redBuildings.push_back(Obstacle(dx,dy+20.f,dx+20.f,dy+40.f,sf::Color(170,40,40)));
 	redBuildings.push_back(Obstacle(dx+20.f,dy+20.f,dx+40.f,dy+40.f,sf::Color(170,60,60)));
 	redBuildings.push_back(Obstacle(dx,dy+40.f,dx+20.f,dy+60.f,sf::Color(170,60,60)));
-	redBuildings.push_back(Obstacle(dx+20.f,dy+40.f,dx+40.f,dy+60.f,sf::Color(170,40,40)));
+	redBuildings.push_back(Obstacle(dx+20.f,dy+40.f,dx+40.f,dy+60.f,sf::Color(170,40,40)));*/
 
 	// Bottom right
 	dx = (float) (rand() % 340 + 400);
 	dy = (float) (rand() % 200 + 280);
 
-	redBuildings.push_back(Obstacle(dx,dy,dx+20.f,dy+20.f,sf::Color(170,60,60)));
+	/*redBuildings.push_back(Obstacle(dx,dy,dx+20.f,dy+20.f,sf::Color(170,60,60)));
 	redBuildings.push_back(Obstacle(dx+20.f,dy,dx+40.f,dy+20.f,sf::Color(170,40,40)));
 	redBuildings.push_back(Obstacle(dx,dy+20.f,dx+20.f,dy+40.f,sf::Color(170,40,40)));
-	redBuildings.push_back(Obstacle(dx+20.f,dy+20.f,dx+40.f,dy+40.f,sf::Color(170,60,60)));
+	redBuildings.push_back(Obstacle(dx+20.f,dy+20.f,dx+40.f,dy+40.f,sf::Color(170,60,60)));*/
 
 	// Top left
 	dx = (float) (rand() % 340 + 10);
 	dy = (float) (rand() % 200 + 10);
 
-	blueBuildings.push_back(Obstacle(dx,dy,dx+20,dy+20,sf::Color(60,60,170)));
+	/*blueBuildings.push_back(Obstacle(dx,dy,dx+20,dy+20,sf::Color(60,60,170)));
 	blueBuildings.push_back(Obstacle(dx+20,dy,dx+40,dy+20,sf::Color(40,40,170)));
 	blueBuildings.push_back(Obstacle(dx,dy+20,dx+20,dy+40,sf::Color(40,40,170)));
-	blueBuildings.push_back(Obstacle(dx+20,dy+20,dx+40,dy+40,sf::Color(60,60,170)));
+	blueBuildings.push_back(Obstacle(dx+20,dy+20,dx+40,dy+40,sf::Color(60,60,170)));*/
 
 	// Bottom left
 	dx = (float) (rand() % 340 + 10);
 	dy = (float) (rand() % 200 + 280);
 
-	blueBuildings.push_back(Obstacle(dx,dy,dx+20,dy+20,sf::Color(60,60,170)));
+	/*blueBuildings.push_back(Obstacle(dx,dy,dx+20,dy+20,sf::Color(60,60,170)));
 	blueBuildings.push_back(Obstacle(dx+20,dy,dx+40,dy+20,sf::Color(40,40,170)));
 	blueBuildings.push_back(Obstacle(dx,dy+20,dx+20,dy+40,sf::Color(40,40,170)));
 	blueBuildings.push_back(Obstacle(dx+20,dy+20,dx+40,dy+40,sf::Color(60,60,170)));
 	blueBuildings.push_back(Obstacle(dx,dy+40,dx+20,dy+60,sf::Color(60,60,170)));
-	blueBuildings.push_back(Obstacle(dx+20,dy+40,dx+40,dy+60,sf::Color(40,40,170)));
+	blueBuildings.push_back(Obstacle(dx+20,dy+40,dx+40,dy+60,sf::Color(40,40,170)));*/
 
 	resetNpc();
 	resetPlayer();
@@ -81,10 +81,9 @@ Game::Game() // Constructor
 	grid = gridObj.m_createGrid(10, 10);
 
 	/*Initialise the AI tank, giving it a starting Cell in the grid of [1][4]. Or the second column, fifth row.*/
-	player = AI(&grid[1][4]);
+	player = AI(&grid[1][4]); //PLAYER IS AI FOR TESTING, WON'T BE PLAYER IN ACTUAL IMPLEMENTATION.
 
-	player.m_setCurrentCell(&grid[7][1]);
-
+	player.m_setEndCell(&grid[1][8]);
 }
 
 Game::~Game(){}  // Destructor
@@ -180,24 +179,15 @@ void Game::play()// Play the game for one timestep
 	player.move();
 
 
-	/*TEMPORARY CHECKING WHICH CELL THE AI IS IN.\
-		-Currently checking all of the grid, it isn't bad,
-		but can probably be made to just check if the AI
-		has reached its target Cell before doing any re-evaluation.
-	*/
-	for (int i = 0; i < grid.size(); i++)
+	if (player.chooseNewEndCell)
 	{
-		for (int j = 0; j < grid[0].size(); j++)
-		{
-			if (player.isInCell(&grid[i][j]))
-			{
-				grid[i][j].setColour(sf::Color::Blue);
-			}
-		}
+		player.m_setEndCell(&grid[player.x][player.y]);
+		player.chooseNewEndCell = false;
 	}
 
+
 	// Check for collisions
-	bool collision = false;
+	/*bool collision = false;
 	for (list<Obstacle>::iterator it = obstacles.begin(); it != obstacles.end(); ++it)
 	{
 		if(player.bb.collision(it->bb))
@@ -224,17 +214,17 @@ void Game::play()// Play the game for one timestep
 	}
 	if(player.bb.collision(npc.bb)) collision = true;
 
-	if(collision)player.recallPos();
+	if(collision)player.recallPos();*/
 
 
 	// Move AI tank
 	//npc.markPos();
-	npc.move();
+	/*npc.move();
 	npc.implementMove();
-	if(npc.isFiring()){fireShell(npc.firingPosition(), true);}
+	if(npc.isFiring()){fireShell(npc.firingPosition(), true);}*/
 
 	// Check for collisions
-	collision = false;
+	/*collision = false;
 	for (list<Obstacle>::iterator it = obstacles.begin(); it != obstacles.end(); ++it)
 	{
 		if(npc.bb.collision(it->bb))
@@ -265,10 +255,10 @@ void Game::play()// Play the game for one timestep
 	{
 		npc.recallPos();
 		npc.collided();
-	}
+	}*/
 
 	// Check if AI Tank can see anything
-    for (list<Obstacle>::iterator it = redBuildings.begin(); it != redBuildings.end(); ++it)
+   /* for (list<Obstacle>::iterator it = redBuildings.begin(); it != redBuildings.end(); ++it)
     {
 	  //if(npc.canSee(it->bb)) npc.markBase(Position((it->bb.getX1() + it->bb.getX2()) / 2.0f, (it->bb.getY1() + it->bb.getY2()) / 2.0f));
     }
@@ -409,7 +399,7 @@ void Game::play()// Play the game for one timestep
 	for (list<Shell>::iterator it = shells.begin(); it != shells.end(); ++it)
 	{
 		if(player.canSee(it->bb)) it->setVisible();
-	}
+	}*/
 
 }
 
@@ -443,9 +433,22 @@ void Game::fireShell(Position fp, bool isNpc)
 
 void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const// Draw the game
 {
+	
+
 	target.draw(background);
 
-	target.draw(ammoArea);
+	/*Draw the Grid.*/
+	for (int i = 0; i < grid.size(); i++)
+	{
+		for (int j = 0; j < grid[0].size(); j++)
+		{
+			target.draw(grid[i][j]);
+		}
+	}
+
+	
+
+	/*target.draw(ammoArea);
 
 	// Draw shells
 	for (list<Shell>::const_iterator it = shells.begin(); it != shells.end(); ++it)
@@ -474,8 +477,7 @@ void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const// Draw 
 	// Draw AITank
 	if (npc.isVisible() || debugMode) target.draw(npc);
 
-	// Draw Player
-	target.draw(player);
+	
 	
 	// Draw ammo
 	sf::RectangleShape ammo(sf::Vector2f(5,10));
@@ -544,17 +546,13 @@ void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const// Draw 
 		}
 
 		target.draw(drawingText);
-	}
+	}*/
 
+	// Draw Player
+	target.draw(player);
 
-	/*Draw the Grid.*/
-	for (int i = 0; i < grid.size(); i++)
-	{
-		for (int j = 0; j < grid[0].size(); j++)
-		{
-			target.draw(grid[i][j]);
-		}
-	}
+	
+	
 }
      
 void Game::keyPressed(sf::Keyboard::Key key)
@@ -622,7 +620,7 @@ void Game::keyReleased(sf::Keyboard::Key key)
 
 bool Game::gameOver() const
 {
-	return numBlueBuildings() == 0 || numRedBuildings() == 0 || (!(player.hasAmmo() || npc.hasAmmo()) && shells.empty());
+	return false; // numBlueBuildings() == 0 || numRedBuildings() == 0 || (!(player.hasAmmo() || npc.hasAmmo()) && shells.empty());
 }
 
 int Game::numBlueBuildings() const

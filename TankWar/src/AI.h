@@ -2,6 +2,7 @@
 
 #include "aitank.h"
 #include "Cell.h"
+#include <queue>
 
 /*This is the class we will work in. Every algorithm should be implemented using the grid in the Game class via
 this class.*/
@@ -14,8 +15,19 @@ private:
 
 	bool forwards;
 
-	bool hasLocatedCell = false;
+	bool hasLocatedCell = false; //!< Is the tank facing the current Cell.
 	bool hasFoundEndCell = false;
+
+	std::queue<Cell*> cellsToCheck;
+	std::vector<Cell*> visitedCells;
+
+	Cell * m_previousEndCell;
+
+
+	
+	void BreadthFirstSearch();
+
+	void cleanup();
 
 public:
 	AI();
@@ -66,4 +78,8 @@ public:
 	void markShell(Position p);
 	bool isFiring();
 	void score(int thisScore, int enemyScore);
+
+	bool chooseNewEndCell = false;
+	int x;
+	int y;
 };

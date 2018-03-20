@@ -28,9 +28,9 @@ Cell::Cell(int xPos, int yPos, int wScaled, int hScaled)
 
 	m_rect.setPosition(sf::Vector2f(m_pos.x * m_widthScaled, m_pos.y * m_heightScaled));
 
-	m_rect.setFillColor(sf::Color::Transparent);
+	m_rect.setFillColor(sf::Color::Green);
 	m_rect.setOutlineThickness(0.5f);
-	m_rect.setOutlineColor(sf::Color::White);
+	m_rect.setOutlineColor(sf::Color::Black);
 
 	m_neighbours = std::shared_ptr<std::vector<Cell*>>(new std::vector<Cell*>);
 }
@@ -121,7 +121,7 @@ void Cell::calculateNeighbours(std::vector< std::vector<Cell> > &grid)
 */
 void Cell::setColour(sf::Color color)
 {
-	m_rect.setOutlineColor(color);
+	m_rect.setFillColor(color);
 }
 
 
