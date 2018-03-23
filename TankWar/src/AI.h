@@ -14,24 +14,23 @@ private:
 	Cell * m_endCell = nullptr; //!< The Cell this tank is aiming to get to.
 	Cell * m_currentCell = nullptr; //!< The Cell this tank is, or is aiming to, evaluate.
 
-	Cell * m_topOfGrid = nullptr;
+	Cell * m_topOfGrid = nullptr; //!< [0][0] in the grid. Used for depth first search.
 
 	bool forwards;
 
-	bool hasLocatedCell = false; //!< Is the tank facing the current Cell.
-	bool hasFoundEndCell = false;
+	bool m_bHasLocatedCell = false; //!< Is the tank facing the current Cell.
+	bool m_bHasFoundEndCell = false; //!< Has the path finding algorithm found the end cell.
 
-	std::queue<Cell*> cellsToCheck;
-	std::vector<Cell*> visitedCells;
+	std::queue<Cell*> m_cellsToCheckQueue; //!< The Cells to evaluate, as a queue, used for BFS.
+	std::stack<Cell*> m_cellsToCheckStack; //!< The Cells to evaluate, as a stack, used for DFS
+	std::vector<Cell*> m_visitedCells; //!< The Cells that have been visited already.
 
-	Cell * m_previousEndCell;
+	Cell * m_previousEndCell; //!< The Cell that was last found by the algorithm.
 
 
-	std::stack<Cell*> cellsToEvaluate;
-	int iNeighbourToCheck = 0;
-	bool bHasBeenVisited = false;
-
-	int count = 0;
+	int m_iNeighbourToCheck = 0; //!< The index of the neighbour to check in current cell's neighbours. Used for DFS.
+	bool m_bHasBeenVisited = false; //!< Has the cell next to be evaluated already been evaluated?
+	
 	
 	void BreadthFirstSearch();
 
@@ -89,7 +88,8 @@ public:
 	bool isFiring();
 	void score(int thisScore, int enemyScore);
 
-	bool chooseNewEndCell = false;
+	bool m_bChooseNewEndCell = false;
+	
 	int x;
 	int y;
 };

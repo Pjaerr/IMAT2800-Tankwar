@@ -91,41 +91,41 @@ void AI::reset()
 
 void AI::cleanup()
 {
-	if (cellsToCheck.size() > 0)
+	if (m_cellsToCheckQueue.size() > 0)
 	{
-		for (int i = cellsToCheck.size(); i == 0; i--)
+		for (int i = m_cellsToCheckQueue.size(); i == 0; i--)
 		{
-			cellsToCheck.pop();
+			m_cellsToCheckQueue.pop();
 		}
 	}
 	
-	if (cellsToEvaluate.size() > 0)
+	if (m_cellsToCheckStack.size() > 0)
 	{
-		for (int i = cellsToEvaluate.size(); i == 0; i--)
+		for (int i = m_cellsToCheckStack.size(); i == 0; i--)
 		{
-			cellsToEvaluate.pop();
+			m_cellsToCheckStack.pop();
 		}
 	}
 	
 
-	visitedCells.clear();
+	m_visitedCells.clear();
 }
 
 void AI::BreadthFirstSearch()
 {
-	if (!hasFoundEndCell)
+	if (!m_bHasFoundEndCell)
 	{
-		cellsToCheck.push(m_currentCell); //Add current cell to queue.
+		m_cellsToCheckQueue.push(m_currentCell); //Add current cell to queue.
 
 		m_currentCell->setColour(sf::Color::Yellow);
 
-		for (int i = 0; i < visitedCells.size(); i++)
+		for (int i = 0; i < m_visitedCells.size(); i++)
 		{
-			if (m_currentCell == visitedCells.at(i)) //If current cell is in visitedCells
+			if (m_currentCell == m_visitedCells.at(i)) //If current cell is in visitedCells
 			{
-				cellsToCheck.front()->setColour(sf::Color::Green);
-				cellsToCheck.pop(); //Pop front of queue.
-				m_currentCell = cellsToCheck.front(); //Set current cell to next Cell in queue.
+				m_cellsToCheckQueue.front()->setColour(sf::Color::Green);
+				m_cellsToCheckQueue.pop(); //Pop front of queue.
+				m_currentCell = m_cellsToCheckQueue.front(); //Set current cell to next Cell in queue.
 				i = 0; //Re-check if new current cell is in visitedCells.
 			}
 		}
@@ -135,20 +135,20 @@ void AI::BreadthFirstSearch()
 		for (int i = 0; i < m_currentCell->m_neighbours->size(); i++)
 		{
 			/*Add all of the current cell's neighbours to the queue.*/
-			cellsToCheck.push(m_currentCell->m_neighbours->at(i));
+			m_cellsToCheckQueue.push(m_currentCell->m_neighbours->at(i));
 
 			m_currentCell->m_neighbours->at(i)->setColour(sf::Color::Yellow);
 		}
 
 		if (m_currentCell == m_endCell) //If current cell is our goal.
 		{
-			chooseNewEndCell = true;
+			m_bChooseNewEndCell = true;
 
 			x = rand() % 10;
 			y = rand() % 10;
 
 			//We win.
-			hasFoundEndCell = true;
+			m_bHasFoundEndCell = true;
 			m_previousEndCell = m_endCell;
 
 			m_currentCell->setColour(sf::Color::Magenta);
@@ -158,52 +158,52 @@ void AI::BreadthFirstSearch()
 		}
 		else //If not
 		{
-			cellsToCheck.front()->setColour(sf::Color::White);
+			m_cellsToCheckQueue.front()->setColour(sf::Color::White);
 
-			cellsToCheck.pop(); //Pop the front of the queue.
-			visitedCells.push_back(m_currentCell); //Add the current cell to visitedCells.
+			m_cellsToCheckQueue.pop(); //Pop the front of the queue.
+			m_visitedCells.push_back(m_currentCell); //Add the current cell to visitedCells.
 
 			m_currentCell->setColour(sf::Color::Green);
 
-			m_currentCell = cellsToCheck.front(); //Set the current cell to the next item in the queue.
+			m_currentCell = m_cellsToCheckQueue.front(); //Set the current cell to the next item in the queue.
 		}
 	}
 }
 
 void AI::DepthFirstSearch()
 {
-	if (visitedCells.empty())
+	if (m_visitedCells.empty())
 	{
 		m_currentCell = m_topOfGrid;
 	}
 
-	if (!hasFoundEndCell)
+	if (!m_bHasFoundEndCell)
 	{
 		m_currentCell->setColour(sf::Color::Red);
 
-		for (int i = 0; i < visitedCells.size(); i++)
+		for (int i = 0; i < m_visitedCells.size(); i++)
 		{
-			if (m_currentCell->m_neighbours->at(iNeighbourToCheck) == visitedCells.at(i))
+			if (m_currentCell->m_neighbours->at(m_iNeighbourToCheck) == m_visitedCells.at(i))
 			{
-				bHasBeenVisited = true;
+				m_bHasBeenVisited = true;
 			}
 		}
 
-		if (!bHasBeenVisited)
+		if (!m_bHasBeenVisited)
 		{
-			if (iNeighbourToCheck < m_currentCell->m_neighbours->size())
+			if (m_iNeighbourToCheck < m_currentCell->m_neighbours->size())
 			{
-				cellsToEvaluate.push(m_currentCell->m_neighbours->at(iNeighbourToCheck)); //Add current cells first neighbour to the stack.
+				m_cellsToCheckStack.push(m_currentCell->m_neighbours->at(m_iNeighbourToCheck)); //Add current cells first neighbour to the stack.
 
-				m_currentCell = cellsToEvaluate.top(); //Current cell becomes the top item in the stack.
+				m_currentCell = m_cellsToCheckStack.top(); //Current cell becomes the top item in the stack.
 
 
 				if (m_currentCell == m_endCell) //Check if we've found our goal.
 				{
 					m_currentCell->setColour(sf::Color::Yellow);
-					hasFoundEndCell = true;
+					m_bHasFoundEndCell = true;
 
-					chooseNewEndCell = true;
+					m_bChooseNewEndCell = true;
 
 					x = rand() % 10;
 					y = rand() % 10;
@@ -218,34 +218,34 @@ void AI::DepthFirstSearch()
 				{
 					
 					m_currentCell->setColour(sf::Color::Blue);
-					visitedCells.push_back(m_currentCell); //Add the current cell to visited cells.
+					m_visitedCells.push_back(m_currentCell); //Add the current cell to visited cells.
 
-					cellsToEvaluate.push(m_currentCell->m_neighbours->at(iNeighbourToCheck)); //Add the first neighbour of the current cell.
+					m_cellsToCheckStack.push(m_currentCell->m_neighbours->at(m_iNeighbourToCheck)); //Add the first neighbour of the current cell.
 				}
 
-				iNeighbourToCheck = 0;
+				m_iNeighbourToCheck = 0;
 			}
 		}
 		else
 		{
-			iNeighbourToCheck++;
+			m_iNeighbourToCheck++;
 
-			if (iNeighbourToCheck >= m_currentCell->m_neighbours->size())
+			if (m_iNeighbourToCheck >= m_currentCell->m_neighbours->size())
 			{
-				cellsToEvaluate.pop();
-				iNeighbourToCheck = 0;
+				m_cellsToCheckStack.pop();
+				m_iNeighbourToCheck = 0;
 			}
 
-			bHasBeenVisited = false;
+			m_bHasBeenVisited = false;
 		}
 	}
 }
 
 void AI::move()
 {
-	//BreadthFirstSearch();
+	BreadthFirstSearch();
 
-	DepthFirstSearch();
+	//DepthFirstSearch();
 
 	/*
 		The code sets up the movement variables, and then calling implementMove() will
@@ -259,9 +259,9 @@ void AI::move()
 		* Stop if reached desired Cell.
 	
 	*/
-	if (hasFoundEndCell)
+	if (m_bHasFoundEndCell)
 	{
-		if (!hasLocatedCell)
+		if (!m_bHasLocatedCell)
 		{
 			//The x and y position of the tank in the game world.
 			int tankX = getX(); 
@@ -295,7 +295,7 @@ void AI::move()
 			}
 			else
 			{
-				hasLocatedCell = true;
+				m_bHasLocatedCell = true;
 			}
 		}
 		else
@@ -308,12 +308,12 @@ void AI::move()
 
 				if (m_previousEndCell == m_endCell)
 				{
-					hasFoundEndCell = true;
+					m_bHasFoundEndCell = true;
 				}
 				else
 				{
-					hasLocatedCell = false;
-					hasFoundEndCell = false; //Temporarily set to true to avoid continued movement without re-evaluation.
+					m_bHasLocatedCell = false;
+					m_bHasFoundEndCell = false; //Temporarily set to true to avoid continued movement without re-evaluation.
 				}
 
 				

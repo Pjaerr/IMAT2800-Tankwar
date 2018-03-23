@@ -67,6 +67,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BFS.h" />
     <ClInclude Include="include\aitank.h" />
     <ClInclude Include="include\boundingBox.h" />
     <ClInclude Include="include\DumbTank.h" />

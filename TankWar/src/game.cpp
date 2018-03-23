@@ -179,10 +179,10 @@ void Game::play()// Play the game for one timestep
 	player.move();
 
 
-	if (player.chooseNewEndCell)
+	if (player.m_bChooseNewEndCell)
 	{
 		player.m_setEndCell(&grid[player.x][player.y]);
-		player.chooseNewEndCell = false;
+		player.m_bChooseNewEndCell = false;
 	}
 
 

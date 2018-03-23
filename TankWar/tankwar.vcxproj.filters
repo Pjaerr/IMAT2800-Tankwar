@@ -51,6 +51,9 @@
     <ClInclude Include="src\AI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="BFS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\aitank.cpp">
