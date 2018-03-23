@@ -81,9 +81,9 @@ Game::Game() // Constructor
 	grid = gridObj.m_createGrid(10, 10);
 
 	/*Initialise the AI tank, giving it a starting Cell in the grid of [1][4]. Or the second column, fifth row.*/
-	player = AI(&grid[1][4]); //PLAYER IS AI FOR TESTING, WON'T BE PLAYER IN ACTUAL IMPLEMENTATION.
+	player = AI(&grid[2][4], &grid[0][0]); //PLAYER IS AI FOR TESTING, WON'T BE PLAYER IN ACTUAL IMPLEMENTATION.
 
-	player.m_setEndCell(&grid[1][8]);
+	player.m_setEndCell(&grid[2][3]);
 }
 
 Game::~Game(){}  // Destructor

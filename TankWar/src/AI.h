@@ -3,6 +3,7 @@
 #include "aitank.h"
 #include "Cell.h"
 #include <queue>
+#include <stack>
 
 /*This is the class we will work in. Every algorithm should be implemented using the grid in the Game class via
 this class.*/
@@ -12,6 +13,8 @@ private:
 	Cell * m_startCell = nullptr; //!< The Cell this tank should start at. Only used once.
 	Cell * m_endCell = nullptr; //!< The Cell this tank is aiming to get to.
 	Cell * m_currentCell = nullptr; //!< The Cell this tank is, or is aiming to, evaluate.
+
+	Cell * m_topOfGrid = nullptr;
 
 	bool forwards;
 
@@ -24,8 +27,15 @@ private:
 	Cell * m_previousEndCell;
 
 
+	std::stack<Cell*> cellsToEvaluate;
+	int iNeighbourToCheck = 0;
+	bool bHasBeenVisited = false;
+
+	int count = 0;
 	
 	void BreadthFirstSearch();
+
+	void DepthFirstSearch();
 
 	void cleanup();
 
@@ -38,7 +48,7 @@ public:
 
 		\param startCell A pointer to the Cell this tank should start at.
 	*/
-	AI(Cell * startCell);
+	AI(Cell * startCell, Cell * topOfGrid);
 
 	/*! Sets the start cell to the cell given to it.
 

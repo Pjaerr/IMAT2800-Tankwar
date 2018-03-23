@@ -14,11 +14,13 @@ as the position of the tank itself.
 
 \param startCell A pointer to the Cell this tank should start at.
 */
-AI::AI(Cell * startCell)
+AI::AI(Cell * startCell, Cell * topOfGrid)
 {
 	clearMovement();
 	m_setStartCell(startCell);
 	m_setCurrentCell(startCell);
+
+	m_topOfGrid = topOfGrid;
 
 	resetTank(startCell->m_realWorldPos.x, startCell->m_realWorldPos.y, 0, 0); //Set the tanks position to the start cell's postion.
 }
@@ -89,10 +91,22 @@ void AI::reset()
 
 void AI::cleanup()
 {
-	for (int i = cellsToCheck.size(); i == 0; i--)
+	if (cellsToCheck.size() > 0)
 	{
-		cellsToCheck.pop();
+		for (int i = cellsToCheck.size(); i == 0; i--)
+		{
+			cellsToCheck.pop();
+		}
 	}
+	
+	if (cellsToEvaluate.size() > 0)
+	{
+		for (int i = cellsToEvaluate.size(); i == 0; i--)
+		{
+			cellsToEvaluate.pop();
+		}
+	}
+	
 
 	visitedCells.clear();
 }
@@ -156,10 +170,82 @@ void AI::BreadthFirstSearch()
 	}
 }
 
+void AI::DepthFirstSearch()
+{
+	if (visitedCells.empty())
+	{
+		m_currentCell = m_topOfGrid;
+	}
+
+	if (!hasFoundEndCell)
+	{
+		m_currentCell->setColour(sf::Color::Red);
+
+		for (int i = 0; i < visitedCells.size(); i++)
+		{
+			if (m_currentCell->m_neighbours->at(iNeighbourToCheck) == visitedCells.at(i))
+			{
+				bHasBeenVisited = true;
+			}
+		}
+
+		if (!bHasBeenVisited)
+		{
+			if (iNeighbourToCheck < m_currentCell->m_neighbours->size())
+			{
+				cellsToEvaluate.push(m_currentCell->m_neighbours->at(iNeighbourToCheck)); //Add current cells first neighbour to the stack.
+
+				m_currentCell = cellsToEvaluate.top(); //Current cell becomes the top item in the stack.
+
+
+				if (m_currentCell == m_endCell) //Check if we've found our goal.
+				{
+					m_currentCell->setColour(sf::Color::Yellow);
+					hasFoundEndCell = true;
+
+					chooseNewEndCell = true;
+
+					x = rand() % 10;
+					y = rand() % 10;
+	
+					m_previousEndCell = m_endCell;
+
+					m_currentCell = m_topOfGrid;
+
+					cleanup();
+				}
+				else
+				{
+					
+					m_currentCell->setColour(sf::Color::Blue);
+					visitedCells.push_back(m_currentCell); //Add the current cell to visited cells.
+
+					cellsToEvaluate.push(m_currentCell->m_neighbours->at(iNeighbourToCheck)); //Add the first neighbour of the current cell.
+				}
+
+				iNeighbourToCheck = 0;
+			}
+		}
+		else
+		{
+			iNeighbourToCheck++;
+
+			if (iNeighbourToCheck >= m_currentCell->m_neighbours->size())
+			{
+				cellsToEvaluate.pop();
+				iNeighbourToCheck = 0;
+			}
+
+			bHasBeenVisited = false;
+		}
+	}
+}
 
 void AI::move()
 {
-	BreadthFirstSearch();
+	//BreadthFirstSearch();
+
+	DepthFirstSearch();
 
 	/*
 		The code sets up the movement variables, and then calling implementMove() will
