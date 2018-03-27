@@ -33,6 +33,8 @@ Cell::Cell(int xPos, int yPos, int wScaled, int hScaled)
 	m_rect.setOutlineColor(sf::Color::Black);
 
 	m_neighbours = std::shared_ptr<std::vector<Cell*>>(new std::vector<Cell*>);
+
+	calculateGeoScore();
 }
 
 
@@ -129,4 +131,20 @@ void Cell::setColour(sf::Color color)
 sf::Vector2i Cell::getPos()
 {
 	return m_pos;
+}
+
+void Cell::calculateGeoScore() 
+{
+	m_iGeographicalScore = m_pos.x + m_pos.y;
+}
+
+void Cell::calculateHeuScore(Cell * otherCell)
+{
+	/*RAW EUCLIDEAN DISTANCE BETWEEN THIS CELL AND THE OTHER CELL.*/
+	float x = std::pow((m_pos.x - otherCell->m_pos.x), 2);
+	float y = std::pow((m_pos.y - otherCell->m_pos.y), 2);
+
+	m_fHeuristicScore = std::sqrt(x + y);
+
+	//m_fHeuristicScore = std::abs(m_pos.x - otherCell->m_pos.x) + abs(m_pos.y - otherCell->m_pos.y);
 }

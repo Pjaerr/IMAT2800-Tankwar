@@ -11,6 +11,9 @@ private:
 	sf::Vector2i m_pos; //!< The x and y position of this Cell in the grid.
 
 public:
+	
+
+
 	Cell();
 
 
@@ -24,10 +27,6 @@ public:
 		\param hScaled The scaled height of the gird. (grid height / grid rows)
 	*/
 	Cell(int xPos, int yPos, int wScaled, int hScaled);
-
-
-	Cell * m_previous = nullptr; //!< Used when recalling the final path. A pointer to the Cell that was visited before this one.
-
 
 	std::shared_ptr<std::vector<Cell*>> m_neighbours; //!< Vector of Cell pointers consisting of this Cell's neighbours.
 
@@ -61,4 +60,13 @@ public:
 
 	int m_widthScaled; //!< The scaled width, used to convert between real world and grid space.
 	int m_heightScaled; //!< The scaled height, used to convert between real world and grid space.
+
+	Cell * m_previousCell = nullptr; //!< Used when recalling the final path. A pointer to the Cell that was visited before this one.
+
+	int m_iGeographicalScore = 0;
+	float m_fHeuristicScore = 0.0f;
+	float m_fFinalScore = 0.0f;
+
+	void calculateGeoScore();
+	void calculateHeuScore(Cell * otherCell);
 };

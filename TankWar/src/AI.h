@@ -36,7 +36,19 @@ private:
 
 	void DepthFirstSearch();
 
+	void AStar();
+
 	void cleanup();
+
+	std::vector<Cell *> m_openSet;
+	std::vector<Cell *> m_closedSet;
+
+	Cell* m_findLowestFinalScore();
+	void m_removeFromOpenSet(Cell * cellToRemove);
+
+	bool m_bIsInOpenSet(Cell * cellToCheck);
+	bool m_bIsInClosedSet(Cell * cellToCheck);
+	
 
 public:
 	AI();
