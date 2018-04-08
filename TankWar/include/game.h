@@ -43,7 +43,11 @@ class Game : public sf::Drawable
 		int numBlueBuildings() const; // Count of blue buildings
 		int numRedBuildings() const; // Count of red buildings
 
-		Grid gridObj;
-		std::vector< std::vector<Cell> > grid;
+
+		//Pathfinding Implementation Stuff
+
+		Grid gridObj; //!< The object used to create a multidimensional vector of Cell objects.
+
+		std::vector< std::vector<Cell> > grid; //!< Grid holding all of the Cells used in the game.
 };
 #endif

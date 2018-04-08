@@ -62,8 +62,6 @@ Top left, Top, Top Right, Right, Bottom Right, Bottom, Bottom Left, Left.
 */
 void Cell::calculateNeighbours(std::vector< std::vector<Cell> > &grid)
 {
-	//THERE'S PROBABLY A BETTER WAY OF DOING THIS.
-
 	/*Add the cell to the right and to the left of this cell as long as this cell isn't
 	at the very edge of the grid.*/
 
@@ -146,5 +144,45 @@ void Cell::calculateHeuScore(Cell * otherCell)
 
 	m_fHeuristicScore = std::sqrt(x + y);
 
+	//Manhattan Distance ->
 	//m_fHeuristicScore = std::abs(m_pos.x - otherCell->m_pos.x) + abs(m_pos.y - otherCell->m_pos.y);
+}
+
+/*! The amount of rotation that needs to occur (in Th) to get to a surrounding Cell as a unit vector.*/
+int Cell::calculateAngleToCell(int x, int y)
+{
+	if (x == 1 && y == 0)
+	{
+		return 0;
+	}
+	else if (x == 1 && y == -1)
+	{
+		return 45;
+	}
+	else if (x == 0 && y == -1)
+	{
+		return 90;
+	}
+	else if (x == -1 && y == -1)
+	{
+		return 135;
+	}
+	else if (x == -1 && y == 0)
+	{
+		return 180;
+	}
+	else if (x == -1 && y == 1)
+	{
+		return 225;
+	}
+	else if (x == 0 && y == 1)
+	{
+		return 270;
+	}
+	else if (x == 1 && y == 1)
+	{
+		return 315;
+	}
+
+	return -1;
 }

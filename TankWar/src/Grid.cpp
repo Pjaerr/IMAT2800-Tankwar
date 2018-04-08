@@ -37,6 +37,9 @@ std::vector< std::vector<Cell> > Grid::m_createGrid(int cols, int rows)
 	float widthScaled = m_windowWidth / cols;
 	float heightScaled = m_windowHeight / rows;
 
+	m_widthScaled = widthScaled;
+	m_heightScaled = heightScaled;
+
 	std::vector< std::vector<Cell> > grid; //The vector to be returned at the end.
 
 	grid.resize(cols); //Initialise the top level vector with spaces matching that of the given columns.

@@ -23,6 +23,9 @@ public:
 	*/
 	Grid(float windowWidth, float windowHeight);
 
+	float m_widthScaled;
+	float m_heightScaled;
+
 	/*!
 	Creates a multidimensional std::vector where each element is a Cell object with its given
 	position as a width/height scaled x/y within that multidimensional std::vector.

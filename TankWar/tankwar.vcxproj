@@ -67,9 +67,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="BFS.h" />
     <ClInclude Include="include\aitank.h" />
+    <ClInclude Include="include\AStar.h" />
+    <ClInclude Include="include\BFS.h" />
     <ClInclude Include="include\boundingBox.h" />
+    <ClInclude Include="include\DFS.h" />
     <ClInclude Include="include\DumbTank.h" />
     <ClInclude Include="include\game.h" />
     <ClInclude Include="include\obstacle.h" />
@@ -84,8 +86,11 @@
   <ItemGroup>
     <ClCompile Include="src\AI.cpp" />
     <ClCompile Include="src\aitank.cpp" />
+    <ClCompile Include="src\AStar.cpp" />
+    <ClCompile Include="src\BFS.cpp" />
     <ClCompile Include="src\boundingBox.cpp" />
     <ClCompile Include="src\Cell.cpp" />
+    <ClCompile Include="src\DFS.cpp" />
     <ClCompile Include="src\DumbTank.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\Grid.cpp" />

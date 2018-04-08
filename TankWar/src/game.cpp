@@ -1,8 +1,6 @@
 #include "game.h"
 
 
-
-
 Game::Game() // Constructor
 {
 	// Set Backgound
@@ -10,9 +8,9 @@ Game::Game() // Constructor
 	background.setFillColor(sf::Color(40,70,20));
 	background.setPosition(10.0f,10.0f);
 
-	/*ammoArea.setSize(sf::Vector2f(800.0f,20.0f));
+	ammoArea.setSize(sf::Vector2f(800.0f,20.0f));
 	ammoArea.setFillColor(sf::Color(140,90,60));
-	ammoArea.setPosition(0.0f,580.0f);*/
+	ammoArea.setPosition(0.0f,580.0f);
 
 	// Seed pseudorandom num gen
 	srand ( (int) time(NULL) );
@@ -21,51 +19,52 @@ Game::Game() // Constructor
 	debugMode = false;
 
 	// Borders
-	/*obstacles.push_back(Obstacle(0.f,0.f,10.f,580.f,sf::Color(100,100,100)));
+	obstacles.push_back(Obstacle(0.f,0.f,10.f,580.f,sf::Color(100,100,100)));
 	obstacles.push_back(Obstacle(0.f,0.f,800.f,10.f,sf::Color(100,100,100)));
 	obstacles.push_back(Obstacle(0.f,570.f,800.f,580.f,sf::Color(100,100,100)));
-	obstacles.push_back(Obstacle(790.f,0.f,800.f,580.f,sf::Color(100,100,100)));*/
+	obstacles.push_back(Obstacle(790.f,0.f,800.f,580.f,sf::Color(100,100,100)));
 
 	float dx, dy;
+
 	// Top right
 	dx = (float) (rand() % 340 + 400);
 	dy = (float) (rand() % 200 + 10);
 
-	/*redBuildings.push_back(Obstacle(dx,dy,dx+20.f,dy+20.f,sf::Color(170,60,60)));
+	redBuildings.push_back(Obstacle(dx,dy,dx+20.f,dy+20.f,sf::Color(170,60,60)));
 	redBuildings.push_back(Obstacle(dx+20.f,dy,dx+40.f,dy+20.f,sf::Color(170,40,40)));
 	redBuildings.push_back(Obstacle(dx,dy+20.f,dx+20.f,dy+40.f,sf::Color(170,40,40)));
 	redBuildings.push_back(Obstacle(dx+20.f,dy+20.f,dx+40.f,dy+40.f,sf::Color(170,60,60)));
 	redBuildings.push_back(Obstacle(dx,dy+40.f,dx+20.f,dy+60.f,sf::Color(170,60,60)));
-	redBuildings.push_back(Obstacle(dx+20.f,dy+40.f,dx+40.f,dy+60.f,sf::Color(170,40,40)));*/
+	redBuildings.push_back(Obstacle(dx+20.f,dy+40.f,dx+40.f,dy+60.f,sf::Color(170,40,40)));
 
 	// Bottom right
 	dx = (float) (rand() % 340 + 400);
 	dy = (float) (rand() % 200 + 280);
 
-	/*redBuildings.push_back(Obstacle(dx,dy,dx+20.f,dy+20.f,sf::Color(170,60,60)));
+	redBuildings.push_back(Obstacle(dx,dy,dx+20.f,dy+20.f,sf::Color(170,60,60)));
 	redBuildings.push_back(Obstacle(dx+20.f,dy,dx+40.f,dy+20.f,sf::Color(170,40,40)));
 	redBuildings.push_back(Obstacle(dx,dy+20.f,dx+20.f,dy+40.f,sf::Color(170,40,40)));
-	redBuildings.push_back(Obstacle(dx+20.f,dy+20.f,dx+40.f,dy+40.f,sf::Color(170,60,60)));*/
+	redBuildings.push_back(Obstacle(dx+20.f,dy+20.f,dx+40.f,dy+40.f,sf::Color(170,60,60)));
 
 	// Top left
 	dx = (float) (rand() % 340 + 10);
 	dy = (float) (rand() % 200 + 10);
 
-	/*blueBuildings.push_back(Obstacle(dx,dy,dx+20,dy+20,sf::Color(60,60,170)));
+	blueBuildings.push_back(Obstacle(dx,dy,dx+20,dy+20,sf::Color(60,60,170)));
 	blueBuildings.push_back(Obstacle(dx+20,dy,dx+40,dy+20,sf::Color(40,40,170)));
 	blueBuildings.push_back(Obstacle(dx,dy+20,dx+20,dy+40,sf::Color(40,40,170)));
-	blueBuildings.push_back(Obstacle(dx+20,dy+20,dx+40,dy+40,sf::Color(60,60,170)));*/
+	blueBuildings.push_back(Obstacle(dx+20,dy+20,dx+40,dy+40,sf::Color(60,60,170)));
 
 	// Bottom left
 	dx = (float) (rand() % 340 + 10);
 	dy = (float) (rand() % 200 + 280);
 
-	/*blueBuildings.push_back(Obstacle(dx,dy,dx+20,dy+20,sf::Color(60,60,170)));
+	blueBuildings.push_back(Obstacle(dx,dy,dx+20,dy+20,sf::Color(60,60,170)));
 	blueBuildings.push_back(Obstacle(dx+20,dy,dx+40,dy+20,sf::Color(40,40,170)));
 	blueBuildings.push_back(Obstacle(dx,dy+20,dx+20,dy+40,sf::Color(40,40,170)));
 	blueBuildings.push_back(Obstacle(dx+20,dy+20,dx+40,dy+40,sf::Color(60,60,170)));
 	blueBuildings.push_back(Obstacle(dx,dy+40,dx+20,dy+60,sf::Color(60,60,170)));
-	blueBuildings.push_back(Obstacle(dx+20,dy+40,dx+40,dy+60,sf::Color(40,40,170)));*/
+	blueBuildings.push_back(Obstacle(dx+20,dy+40,dx+40,dy+60,sf::Color(40,40,170)));
 
 	resetNpc();
 	resetPlayer();
@@ -73,6 +72,7 @@ Game::Game() // Constructor
 	redScore = 0;
 	blueScore = 0;
 
+	///#### GRID AND AI TANK CREATION ####///
 	
 	/*Create the grid with a size of the playing area. (780, 570)*/
 	gridObj = Grid(background.getPosition().x + background.getSize().x, background.getPosition().y + background.getSize().y); //The size of the playing area.
@@ -83,7 +83,13 @@ Game::Game() // Constructor
 	/*Initialise the AI tank, giving it a starting Cell in the grid of [1][4]. Or the second column, fifth row.*/
 	player = AI(&grid[2][4], &grid[0][0]); //PLAYER IS AI FOR TESTING, WON'T BE PLAYER IN ACTUAL IMPLEMENTATION.
 
-	player.m_setEndCell(&grid[8][8]);
+	//Grab the x and y of the other tank and convert it to a position in grid space.
+	int x = (npc.getX() / gridObj.m_widthScaled);
+	int y = (npc.getY() / gridObj.m_heightScaled);
+
+	player.m_setEndCell(&grid[x][y]); //Set the AI Tank's starting goal to be that in the grid.
+
+	///#### GRID AND AI TANK CREATION ####///
 }
 
 Game::~Game(){}  // Destructor
@@ -174,20 +180,48 @@ void Game::resetPlayer()
 
 void Game::play()// Play the game for one timestep
 {
+	///#### AI TANK UPDATE CODE	 ####///
+
 	// Move tank
-	//player.markPos();
-	player.move();
+	player.markPos(); //Stores the previous position to help with collision correction.
+
+	player.move(); //Moves this tank according to the pathfinding algorithm.
 
 
+	//Should a new path try to be found by the AI Tank, occurs when the it has found the previous path.
 	if (player.m_bChooseNewEndCell)
-	{
-		player.m_setEndCell(&grid[player.x][player.y]);
-		player.m_bChooseNewEndCell = false;
+	{	
+		//Grab the x and y position of the other tank within the grid.
+		int x = (npc.getX() / gridObj.m_widthScaled);
+		int y = (npc.getY() / gridObj.m_heightScaled);
+
+		player.m_setEndCell(&grid[x][y]); //Update the AI Tank's end goal.
+		
+		player.m_bChooseNewEndCell = false; //Tell the AI Tank to start searching.
 	}
+
+	player.m_enemyWithinRange(npc.getX(), npc.getY()); //TEMPORARY RADIUS DETECTION.
+
+	/*Set the AI Tank's current position within the grid.*/
+	for (int i = 0; i < grid.size(); i++)
+	{
+		for (int j = 0; j < grid[0].size(); j++)
+		{
+			if (player.m_currentTankPos != &grid[i][j])
+			{
+				if (player.isInCell(&grid[i][j]))
+				{
+					player.m_currentTankPos = &grid[i][j];
+				}
+			}
+		}
+	}
+
+	///#### AI TANK UPDATE CODE	 ####///
 
 
 	// Check for collisions
-	/*bool collision = false;
+	bool collision = false;
 	for (list<Obstacle>::iterator it = obstacles.begin(); it != obstacles.end(); ++it)
 	{
 		if(player.bb.collision(it->bb))
@@ -212,19 +246,20 @@ void Game::play()// Play the game for one timestep
 			break;
 		}
 	}
+	
 	if(player.bb.collision(npc.bb)) collision = true;
 
-	if(collision)player.recallPos();*/
+	if(collision)player.recallPos();
 
 
 	// Move AI tank
-	//npc.markPos();
-	/*npc.move();
+	npc.markPos();
+	npc.move();
 	npc.implementMove();
-	if(npc.isFiring()){fireShell(npc.firingPosition(), true);}*/
+	if(npc.isFiring()){fireShell(npc.firingPosition(), true);}
 
 	// Check for collisions
-	/*collision = false;
+	collision = false;
 	for (list<Obstacle>::iterator it = obstacles.begin(); it != obstacles.end(); ++it)
 	{
 		if(npc.bb.collision(it->bb))
@@ -249,28 +284,30 @@ void Game::play()// Play the game for one timestep
 			break;
 		}
 	}
+
 	if(npc.bb.collision(player.bb)) collision = true;
 
 	if(collision)
 	{
 		npc.recallPos();
 		npc.collided();
-	}*/
+	}
 
 	// Check if AI Tank can see anything
-   /* for (list<Obstacle>::iterator it = redBuildings.begin(); it != redBuildings.end(); ++it)
+    for (list<Obstacle>::iterator it = redBuildings.begin(); it != redBuildings.end(); ++it)
     {
-	  //if(npc.canSee(it->bb)) npc.markBase(Position((it->bb.getX1() + it->bb.getX2()) / 2.0f, (it->bb.getY1() + it->bb.getY2()) / 2.0f));
+		/*POTENTIALLY NEED TO BE RE-COMMENTED*/
+	  if(npc.canSee(it->bb)) npc.markBase(Position((it->bb.getX1() + it->bb.getX2()) / 2.0f, (it->bb.getY1() + it->bb.getY2()) / 2.0f));
     }
     for (list<Obstacle>::iterator it = blueBuildings.begin(); it != blueBuildings.end(); ++it)
     {
-	  //if(npc.canSee(it->bb)) npc.markTarget(Position((it->bb.getX1() + it->bb.getX2()) / 2.0f, (it->bb.getY1() + it->bb.getY2()) / 2.0f));
+	  if(npc.canSee(it->bb)) npc.markTarget(Position((it->bb.getX1() + it->bb.getX2()) / 2.0f, (it->bb.getY1() + it->bb.getY2()) / 2.0f));
     }
     for (list<Shell>::iterator it = shells.begin(); it != shells.end(); ++it)
     {
-	  //if(npc.canSee(it->bb) && !it->isNpc()) npc.markShell(Position((it->bb.getX1() + it->bb.getX2()) / 2.0f, (it->bb.getY1() + it->bb.getY2()) / 2.0f));
+	  if(npc.canSee(it->bb) && !it->isNpc()) npc.markShell(Position((it->bb.getX1() + it->bb.getX2()) / 2.0f, (it->bb.getY1() + it->bb.getY2()) / 2.0f));
     }
-	//if(npc.canSee(player.bb)) npc.markEnemy(Position((player.bb.getX1() + player.bb.getX2()) / 2.0f, (player.bb.getY1() + player.bb.getY2()) / 2.0f ));
+	if(npc.canSee(player.bb)) npc.markEnemy(Position((player.bb.getX1() + player.bb.getX2()) / 2.0f, (player.bb.getY1() + player.bb.getY2()) / 2.0f ));
 
 	// Move shells
 	for (list<Shell>::iterator it = shells.begin(); it != shells.end(); ++it){it->move();}
@@ -399,7 +436,7 @@ void Game::play()// Play the game for one timestep
 	for (list<Shell>::iterator it = shells.begin(); it != shells.end(); ++it)
 	{
 		if(player.canSee(it->bb)) it->setVisible();
-	}*/
+	}
 
 }
 
@@ -433,8 +470,6 @@ void Game::fireShell(Position fp, bool isNpc)
 
 void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const// Draw the game
 {
-	
-
 	target.draw(background);
 
 	/*Draw the Grid.*/
@@ -446,9 +481,11 @@ void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const// Draw 
 		}
 	}
 
-	
+	target.draw(player);
 
-	/*target.draw(ammoArea);
+	target.draw(player.m_shootRadius);
+
+	target.draw(ammoArea);
 
 	// Draw shells
 	for (list<Shell>::const_iterator it = shells.begin(); it != shells.end(); ++it)
@@ -477,7 +514,6 @@ void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const// Draw 
 	// Draw AITank
 	if (npc.isVisible() || debugMode) target.draw(npc);
 
-	
 	
 	// Draw ammo
 	sf::RectangleShape ammo(sf::Vector2f(5,10));
@@ -546,13 +582,7 @@ void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const// Draw 
 		}
 
 		target.draw(drawingText);
-	}*/
-
-	// Draw Player
-	target.draw(player);
-
-	
-	
+	}
 }
      
 void Game::keyPressed(sf::Keyboard::Key key)
@@ -561,34 +591,33 @@ void Game::keyPressed(sf::Keyboard::Key key)
 	{
 	   case	sf::Keyboard::Tab :
 		   debugMode = !debugMode;
-		   player.toggleDebugMode();
-		   npc.toggleDebugMode();
+		   /*player.toggleDebugMode();
+		   npc.toggleDebugMode();*/
 		   for (list<Shell>::iterator it = shells.begin(); it != shells.end(); ++it){it->toggleDebugMode();}
 		   break;
 	   case  sf::Keyboard::W : 
-		   player.goForward();
+		   //player.goForward();
 		   break;
 	   case  sf::Keyboard::A : 
-		   player.goLeft();
+		   //player.goLeft();
 		   break;
 	   case  sf::Keyboard::S : 
-		   player.goBackward();
+		   //player.goBackward();
 		   break;
 	   case  sf::Keyboard::D : 
-		   player.goRight();
+		   //player.goRight();
 		   break;
 	   case	sf::Keyboard::Space :
-		   if(player.canFire())
+		   /*if(player.canFire())
 		   {
-			//player.fire();
 			fireShell(player.firingPosition(), false);
-		   }
+		   }*/
 		   break;
 	   case  sf::Keyboard::Left:
-		   player.turretGoLeft();
+		   //player.turretGoLeft();
 		   break;
 	   case  sf::Keyboard::Right:
-		   player.turretGoRight();
+		   //player.turretGoRight();
 		   break;
 	}
 }
@@ -598,29 +627,29 @@ void Game::keyReleased(sf::Keyboard::Key key)
 	switch(key)
 	{
 	   case  sf::Keyboard::W : 
-		   player.stop();
+		   //player.stop();
 		   break;
 	   case  sf::Keyboard::A : 
-		   player.stop();
+		   //player.stop();
 		   break;
 	   case  sf::Keyboard::S : 
-		   player.stop();
+		   //player.stop();
 		   break;
 	   case  sf::Keyboard::D : 
-		   player.stop();
+		   //player.stop();
 		   break;
 	   case  sf::Keyboard::Left:
-		   player.stopTurret();
+		   //player.stopTurret();
 		   break;
 	   case  sf::Keyboard::Right:
-		   player.stopTurret();
+		   //player.stopTurret();
 		   break;
 	}
 }
 
 bool Game::gameOver() const
 {
-	return false; // numBlueBuildings() == 0 || numRedBuildings() == 0 || (!(player.hasAmmo() || npc.hasAmmo()) && shells.empty());
+	return numBlueBuildings() == 0 || numRedBuildings() == 0 || (!(player.hasAmmo() || npc.hasAmmo()) && shells.empty());
 }
 
 int Game::numBlueBuildings() const
