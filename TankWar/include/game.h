@@ -9,6 +9,9 @@
 #include "obstacle.h"
 #include "shell.h"
 
+#include "Grid.h"
+#include "AI.h"
+
 using namespace std;
 
 class Game : public sf::Drawable
@@ -33,11 +36,18 @@ class Game : public sf::Drawable
 		virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const; // Draw the game
 		void play(); // Play the game for one timestep
 		DumbTank npc; // Red tank
-		PlayerTank player; // Blue tank
+		AI player; // Blue tank
 		void keyPressed(sf::Keyboard::Key key); // function for processing input
 		void keyReleased(sf::Keyboard::Key key); // function for processing input
 		bool gameOver() const; // Has the game finished?
 		int numBlueBuildings() const; // Count of blue buildings
 		int numRedBuildings() const; // Count of red buildings
+
+
+		//Pathfinding Implementation Stuff
+
+		Grid gridObj; //!< The object used to create a multidimensional vector of Cell objects.
+
+		std::vector< std::vector<Cell> > grid; //!< Grid holding all of the Cells used in the game.
 };
 #endif

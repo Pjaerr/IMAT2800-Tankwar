@@ -25,6 +25,7 @@ Game::Game() // Constructor
 	obstacles.push_back(Obstacle(790.f,0.f,800.f,580.f,sf::Color(100,100,100)));
 
 	float dx, dy;
+
 	// Top right
 	dx = (float) (rand() % 340 + 400);
 	dy = (float) (rand() % 200 + 10);
@@ -70,12 +71,31 @@ Game::Game() // Constructor
 
 	redScore = 0;
 	blueScore = 0;
-	}
 
-	Game::~Game(){}  // Destructor
+	///#### GRID AND AI TANK CREATION ####///
+	
+	/*Create the grid with a size of the playing area. (780, 570)*/
+	gridObj = Grid(background.getPosition().x + background.getSize().x, background.getPosition().y + background.getSize().y); //The size of the playing area.
 
-	// Set a random Position which does not collide with anything
-	void Game::resetNpc()
+	/*Give the grid 10 columns and 10 rows. (can mismatch, but no point, better results when a square)*/
+	grid = gridObj.m_createGrid(10, 10);
+
+	/*Initialise the AI tank, giving it a starting Cell in the grid of [1][4]. Or the second column, fifth row.*/
+	player = AI(&grid[2][4], &grid[0][0]); //PLAYER IS AI FOR TESTING, WON'T BE PLAYER IN ACTUAL IMPLEMENTATION.
+
+	//Grab the x and y of the other tank and convert it to a position in grid space.
+	int x = (npc.getX() / gridObj.m_widthScaled);
+	int y = (npc.getY() / gridObj.m_heightScaled);
+
+	player.m_setEndCell(&grid[x][y]); //Set the AI Tank's starting goal to be that in the grid.
+
+	///#### GRID AND AI TANK CREATION ####///
+}
+
+Game::~Game(){}  // Destructor
+
+// Set a random Position which does not collide with anything
+void Game::resetNpc()
 	{
 	bool collision = true;
 	while(collision)
@@ -127,7 +147,7 @@ void Game::resetPlayer()
 		float th =(float) ( rand() % 359);
 		float tth = th;
 		player.resetTank(x,y,th,tth);
-		player.reset();
+		player.reset(); //< dON'T PUT HERE CHECK TO SEE IF NONE COLLISION FIRST, INITALL ONLY STOPPED FORWARDS BOOL NOT THIS
 
 		collision = false;
 		for (list<Obstacle>::iterator it = obstacles.begin(); it != obstacles.end(); ++it)
@@ -160,9 +180,49 @@ void Game::resetPlayer()
 
 void Game::play()// Play the game for one timestep
 {
+	///#### AI TANK UPDATE CODE	 ####///
+
 	// Move tank
-	player.markPos();
-	player.move();
+	player.markPos(); //Stores the previous position to help with collision correction.
+
+	player.m_setOpponentBoundingBox(npc.bb);
+
+	player.move(); //Moves this tank according to the pathfinding algorithm.
+
+
+	//Should a new path try to be found by the AI Tank, occurs when the it has found the previous path.
+	if (player.m_shouldChooseNewEndCell())
+	{	
+		//Grab the x and y position of the other tank within the grid.
+		int x = (npc.getX() / gridObj.m_widthScaled);
+		int y = (npc.getY() / gridObj.m_heightScaled);
+
+		player.m_setEndCell(&grid[x][y]); //Update the AI Tank's end goal.
+	}
+
+	/*Set the AI Tank's current position within the grid.*/
+	for (int i = 0; i < grid.size(); i++)
+	{
+		for (int j = 0; j < grid[0].size(); j++)
+		{
+			if (player.m_currentTankPos != &grid[i][j])
+			{
+				if (player.isInCell(&grid[i][j]))
+				{
+					player.m_currentTankPos = &grid[i][j];
+				}
+			}
+		}
+	}
+
+	if (player.m_bShouldFireShell)
+	{
+		fireShell(player.firingPosition(), false);
+	}
+	
+
+	///#### AI TANK UPDATE CODE	 ####///
+
 
 	// Check for collisions
 	bool collision = false;
@@ -190,6 +250,7 @@ void Game::play()// Play the game for one timestep
 			break;
 		}
 	}
+	
 	if(player.bb.collision(npc.bb)) collision = true;
 
 	if(collision)player.recallPos();
@@ -227,6 +288,7 @@ void Game::play()// Play the game for one timestep
 			break;
 		}
 	}
+
 	if(npc.bb.collision(player.bb)) collision = true;
 
 	if(collision)
@@ -238,6 +300,7 @@ void Game::play()// Play the game for one timestep
 	// Check if AI Tank can see anything
     for (list<Obstacle>::iterator it = redBuildings.begin(); it != redBuildings.end(); ++it)
     {
+		/*POTENTIALLY NEED TO BE RE-COMMENTED*/
 	  if(npc.canSee(it->bb)) npc.markBase(Position((it->bb.getX1() + it->bb.getX2()) / 2.0f, (it->bb.getY1() + it->bb.getY2()) / 2.0f));
     }
     for (list<Obstacle>::iterator it = blueBuildings.begin(); it != blueBuildings.end(); ++it)
@@ -413,6 +476,17 @@ void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const// Draw 
 {
 	target.draw(background);
 
+	/*Draw the Grid.*/
+	for (int i = 0; i < grid.size(); i++)
+	{
+		for (int j = 0; j < grid[0].size(); j++)
+		{
+			target.draw(grid[i][j]);
+		}
+	}
+
+	target.draw(player);
+
 	target.draw(ammoArea);
 
 	// Draw shells
@@ -442,8 +516,6 @@ void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const// Draw 
 	// Draw AITank
 	if (npc.isVisible() || debugMode) target.draw(npc);
 
-	// Draw Player
-	target.draw(player);
 	
 	// Draw ammo
 	sf::RectangleShape ammo(sf::Vector2f(5,10));
@@ -464,42 +536,53 @@ void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const// Draw 
 	// Draw scores
 	sf::Font font;
 	font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf");
+
 	char msg[255];
 	sprintf_s(msg,"%d", blueScore);
+
 	sf::Text drawingText(sf::String(msg),font,18);
 	drawingText.setColor(sf::Color::White);
-
 	drawingText.setPosition(250,577);
+
 	target.draw(drawingText);
 
 	sprintf_s(msg,"%d", redScore);
+
 	drawingText.setString(sf::String(msg));
 	drawingText.setPosition(550,577);
+
 	target.draw(drawingText);
 
 	// Draw game over
 	if(gameOver())
 	{
 		sprintf_s(msg,"GAME OVER", blueScore);
+
 		sf::Text drawingText(sf::String(msg),font,42);
 		drawingText.setPosition(300, 140);
+
 		target.draw(drawingText);
+
 		drawingText.setPosition(300, 240);
+
 		if(redScore > blueScore)
 		{
 			sprintf_s(msg,"RED WINS!", blueScore);
 			drawingText.setString(sf::String(msg));
 		}
+
 		if(redScore < blueScore)
 		{
 			sprintf_s(msg,"BLUE WINS!", blueScore);
 			drawingText.setString(sf::String(msg));
 		}
+
 		if(redScore == blueScore)
 		{
 			sprintf_s(msg,"MATCH DRAW!", blueScore);
 			drawingText.setString(sf::String(msg));
 		}
+
 		target.draw(drawingText);
 	}
 }
@@ -510,34 +593,33 @@ void Game::keyPressed(sf::Keyboard::Key key)
 	{
 	   case	sf::Keyboard::Tab :
 		   debugMode = !debugMode;
-		   player.toggleDebugMode();
-		   npc.toggleDebugMode();
+		   /*player.toggleDebugMode();
+		   npc.toggleDebugMode();*/
 		   for (list<Shell>::iterator it = shells.begin(); it != shells.end(); ++it){it->toggleDebugMode();}
 		   break;
 	   case  sf::Keyboard::W : 
-		   player.goForward();
+		   //player.goForward();
 		   break;
 	   case  sf::Keyboard::A : 
-		   player.goLeft();
+		   //player.goLeft();
 		   break;
 	   case  sf::Keyboard::S : 
-		   player.goBackward();
+		   //player.goBackward();
 		   break;
 	   case  sf::Keyboard::D : 
-		   player.goRight();
+		   //player.goRight();
 		   break;
 	   case	sf::Keyboard::Space :
-		   if(player.canFire())
+		   /*if(player.canFire())
 		   {
-			player.fire();
 			fireShell(player.firingPosition(), false);
-		   }
+		   }*/
 		   break;
 	   case  sf::Keyboard::Left:
-		   player.turretGoLeft();
+		   //player.turretGoLeft();
 		   break;
 	   case  sf::Keyboard::Right:
-		   player.turretGoRight();
+		   //player.turretGoRight();
 		   break;
 	}
 }
@@ -547,22 +629,22 @@ void Game::keyReleased(sf::Keyboard::Key key)
 	switch(key)
 	{
 	   case  sf::Keyboard::W : 
-		   player.stop();
+		   //player.stop();
 		   break;
 	   case  sf::Keyboard::A : 
-		   player.stop();
+		   //player.stop();
 		   break;
 	   case  sf::Keyboard::S : 
-		   player.stop();
+		   //player.stop();
 		   break;
 	   case  sf::Keyboard::D : 
-		   player.stop();
+		   //player.stop();
 		   break;
 	   case  sf::Keyboard::Left:
-		   player.stopTurret();
+		   //player.stopTurret();
 		   break;
 	   case  sf::Keyboard::Right:
-		   player.stopTurret();
+		   //player.stopTurret();
 		   break;
 	}
 }
