@@ -166,7 +166,7 @@ void AStar::Run(Cell * currentTankPos)
 		{
 			Cell *currentNeighbour = m_currentCell->m_neighbours->at(i);
 
-			if (!m_bIsInClosedSet(currentNeighbour)) //If the Current neighbour is not in the closed set.
+			if (!m_bIsInClosedSet(currentNeighbour) && !currentNeighbour->m_bIsAnObstacle) //If the Current neighbour is not in the closed set.
 			{
 				/*Work out the temporary Geographical score.
 				(current cell g score + distance between current neighbour and current cell.)*/
@@ -204,12 +204,3 @@ void AStar::Run(Cell * currentTankPos)
 	}
 }
 
-
-
-/*TODO:
-	.Implement A* via the use of an object and then, when working, delete the A*
-	implementation that is local to the AI Tank class.
-	.Add a task onto Trello to ensure that BFS and DFS work through the use of an object and the use
-	of storing a path for the tank to follow as opposed to just going straight to the end cell.
-	.Add a task onto Trello to factor in Cells with bases on them as non usable.
-	*/

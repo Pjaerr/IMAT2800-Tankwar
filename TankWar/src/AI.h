@@ -18,22 +18,30 @@ private:
 	bool forwards; //!< Is the tank moving forwards?
 
 	/*POTENTIALLY DON'T NEED. FIGURE OUT AFTER GETTING WHOLE THING WORKING.*/
-	int m_totalStepsX = 0;
-	int m_totalStepsY = 0;
-	bool m_bReachedCell = true;
-	int m_iLeftSteps = 0;
-	int m_iRightSteps = 0;
+	int m_iTankNormalisedX = 0;
+	int m_iTankNormalisedY = 0;
 
-	bool m_shouldChooseNewEndCell(); //!< Called by Game.cpp and returns true if a new end cell is needed.
+	int m_iTargetNormalisedX = 0;
+	int m_iTargetNormalisedY = 0;
+
+	bool m_bReachedCell = true;
+	float dotProd;
+
+	BoundingBox opponentBB;
+
+	
 
 public:
 	AI(); //!< The default constructor.
 
+	bool m_shouldChooseNewEndCell(); //!< Called by Game.cpp and returns true if a new end cell is needed.
+
 	bool m_canSeeEnemy = false; //** TEMPORARY ENEMY DETECTION (use existing code.)
 
-	void m_enemyWithinRange(float enemyX, float enemyY); //** TEMPORARY ENEMY DETECTION (use existing code.)
+	bool m_bShouldFireShell = false;
 
-	sf::CircleShape m_shootRadius; //** TEMPORARY ENEMY DETECTION (use existing code.)
+	float currentTurretAngle = 0;
+	float currentBodyAngle = 0;
 
 	Cell * m_currentTankPos = nullptr; //!< The position of this tank within the grid.
 
@@ -63,6 +71,8 @@ public:
 		\param cell The Cell to check for.
 	*/
 	bool isInCell(Cell * cell);
+
+	void m_setOpponentBoundingBox(BoundingBox bb);
 
 
 	/*Overriden Base Functionality. (See: aitank.h)*/

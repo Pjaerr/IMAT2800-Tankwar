@@ -60,6 +60,8 @@ public:
 	float m_fHeuristicScore = 0.0f; //!< The heuristic score between this Cell and the End Cell.
 	float m_fFinalScore = 0.0f; //!< Combination of the previous scores.
 
+	bool m_bIsAnObstacle = false;
+
 	void calculateGeoScore(); //!< Works out the number of steps needed to get to this Cell.
 
 	void calculateHeuScore(Cell * otherCell); //!< Works out the heuristic between this Cell and the End Cell.

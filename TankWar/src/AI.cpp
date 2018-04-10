@@ -1,27 +1,11 @@
 #include "AI.h"
 #include <random>
 
+
+/*COULD PROBABLY MAKE AI A TEMPLATE CLASS WHERE THE TYPE IT TAKES IS ONE OF THE ALGORITHMS
+AND THEN RUN THE ALGORITHMS T*/
 AI::AI()
 {
-}
-
-//** TEMPORARY ENEMY DETECTION (use existing code.)
-void AI::m_enemyWithinRange(float enemyX, float enemyY)
-{
-	float a = pos.getX() - enemyX;
-	float b = pos.getY() - enemyY;
-
-	float dist = sqrt(pow(a, 2) + pow(b, 2));
-
-	if (dist < m_shootRadius.getRadius())
-	{
-		std::cout << "IN RANGE" << std::endl;
-		m_canSeeEnemy = true;
-	}
-	else
-	{
-		m_canSeeEnemy = false;
-	}
 }
 
 /*!Sets up the start and current cell (they are the same at the start) as well
@@ -35,11 +19,6 @@ AI::AI(Cell *startCell, Cell *topOfGrid)
 
 	//Store DFS top of grid here.
 
-	//m_shootRadius.setRadius(160.0f);
-	m_shootRadius.setOrigin(m_shootRadius.getGlobalBounds().width * 0.5f, m_shootRadius.getGlobalBounds().height * 0.5f);
-	m_shootRadius.setFillColor(sf::Color::Transparent);
-	m_shootRadius.setOutlineThickness(2.0f);
-	m_shootRadius.setOutlineColor(sf::Color::Black);
 
 	resetTank(startCell->m_realWorldPos.x, startCell->m_realWorldPos.y, 0, 0); //Set the tanks position to the start cell's postion.
 }
@@ -70,93 +49,86 @@ bool AI::isInCell(Cell *cell)
 
 bool AI::m_shouldChooseNewEndCell() // Grab from the desired algorithm object
 {
-	return Astar.m_bChooseNewEndCell;
+	bool temp = Astar.m_bChooseNewEndCell;
+
+	Astar.m_bChooseNewEndCell = !temp;
+
+	return temp;
+}
+
+void AI::m_setOpponentBoundingBox(BoundingBox bb)
+{
+	opponentBB = bb;
 }
 
 void AI::move()
 {
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	{
+		reset();
+	}
+
+	stopTurret();
+	m_bShouldFireShell = false;
 	Astar.Run(m_currentTankPos);
 
-	m_shootRadius.setPosition(pos.getX(), pos.getY());
 
 	if (Astar.m_bHasFoundPath)
 	{
-		if (!Astar.m_pathTaken.empty())
+		if (Astar.m_pathTaken.size() > 1)
 		{
-			Cell cellToMoveTo = Astar.m_pathTaken.at(Astar.m_pathTaken.size() - 1);
+			Cell cellToMoveTo = Astar.m_pathTaken.at(Astar.m_pathTaken.size() - 2);
 
-			if (!m_canSeeEnemy)
+			if (!canSee(opponentBB))
 			{
-				cellToMoveTo.setColour(sf::Color::Yellow);
-				//std::cout << cellToMoveTo.getPos().x << std::endl;
-				//std::cout << cellToMoveTo.getPos().y << std::endl;
-				m_totalStepsX = cellToMoveTo.getPos().x - m_currentTankPos->getPos().x;
-				m_totalStepsY = m_currentTankPos->getPos().y - cellToMoveTo.getPos().y;
-
-				/*std::cout << "X: " << m_totalStepsX << std::endl;
-				std::cout << "Y: " << m_totalStepsY << std::endl;*/
+				float totalStepsX = cellToMoveTo.getPos().x - m_currentTankPos->getPos().x;
+				float totalStepsY = m_currentTankPos->getPos().y - cellToMoveTo.getPos().y;
 
 				int stepsX;
 				int stepsY;
 
-				m_totalStepsX == 0 ? stepsX = 0 : stepsX = m_totalStepsX / abs(m_totalStepsX);
-				m_totalStepsY == 0 ? stepsY = 0 : stepsY = m_totalStepsY / abs(m_totalStepsY);
+				totalStepsX == 0 ? stepsX = 0 : stepsX = totalStepsX / abs(totalStepsX);
+				totalStepsY == 0 ? stepsY = 0 : stepsY = totalStepsY / abs(totalStepsY);
 
 				int angle = m_currentTankPos->calculateAngleToCell(stepsX, stepsY);
 
-				std::cout << angle << std::endl;
-
 				float th = pos.getTh();
 
-				if (m_bReachedCell)
+				/*Take delta = target - current (if it is negative, then add 360 until it is in the range 0 to 360)
+
+				Now if it is above 180 it is right, and if it is below 180 then it is left*/
+
+				int delta = th - angle;
+
+				if (delta < 0)
 				{
-					m_iRightSteps = 0;
-					m_iLeftSteps = 0;
-
-					float temporaryTh = th;
-
-					if (angle != -1)
-					{
-						while (temporaryTh != angle)
-						{
-
-							temporaryTh++;
-							if (temporaryTh > 360)
-								temporaryTh = 0;
-							m_iRightSteps++;
-						}
-
-						temporaryTh = th;
-
-						while (temporaryTh != angle)
-						{
-
-							temporaryTh--;
-							if (temporaryTh < 0)
-								temporaryTh = 360;
-							m_iLeftSteps++;
-						}
-
-						m_bReachedCell = false;
-					}
+					delta += 360;
 				}
-
-				std::cout << th << std::endl;
-
-				std::cout << "Right: " << m_iRightSteps << std::endl;
-				std::cout << "Left: " << m_iLeftSteps << std::endl;
 
 				if (th == angle)
 				{
 					goForward();
 				}
-				else if (m_iRightSteps < m_iLeftSteps)
+				else if (delta > 180)
 				{
 					goRight();
+					currentBodyAngle++;
+
+					if (currentBodyAngle > 360)
+					{
+					currentBodyAngle = 0;
+					}
 				}
-				else
+				else if(delta < 180)
 				{
 					goLeft();
+					currentBodyAngle--;
+
+					if (currentBodyAngle < -360)
+					{
+					currentBodyAngle = 0;
+					}
 				}
 
 				if (*m_currentTankPos == cellToMoveTo)
@@ -168,11 +140,100 @@ void AI::move()
 
 				implementMove();
 			}
+			else
+			{
+				stop();
+				float totalStepsX = Astar.m_endCell->m_realWorldPos.x - m_currentTankPos->m_realWorldPos.x;
+				float totalStepsY = m_currentTankPos->m_realWorldPos.y - Astar.m_endCell->m_realWorldPos.y;
+
+				int stepsX;
+				int stepsY;
+
+				totalStepsX == 0 ? stepsX = 0 : stepsX = totalStepsX / abs(totalStepsX);
+				totalStepsY == 0 ? stepsY = 0 : stepsY = totalStepsY / abs(totalStepsY);
+
+				int angle = m_currentTankPos->calculateAngleToCell(stepsX, stepsY);
+
+				float angleToFace = atan2(Astar.m_endCell->m_realWorldPos.y - pos.getY(), Astar.m_endCell->m_realWorldPos.x - pos.getX());
+
+				angleToFace = RAD2DEG(angleToFace);
+
+				int th = turretTh;
+
+				std::cout << "Our Angle: " << currentTurretAngle << std::endl;
+				std::cout << "Our Angle Corrected: " << currentTurretAngle + currentBodyAngle << std::endl;
+				std::cout << "Body Angle: " << currentBodyAngle << std::endl;
+				std::cout << "Angle: " << (int)angleToFace << std::endl;
+
+				if (currentTurretAngle == (int)angleToFace)
+				{
+					m_bShouldFireShell = true;
+				}
+				else if (currentTurretAngle < (int)angleToFace)
+				{
+					turretGoRight();
+					currentTurretAngle++;
+
+					if (currentTurretAngle > 360)
+					{
+						currentTurretAngle = 0;
+					}
+				}
+				else if (currentTurretAngle > (int)angleToFace)
+				{
+					turretGoLeft();
+					currentTurretAngle--;
+
+					if (currentTurretAngle < -360)
+					{
+						currentTurretAngle = 0;
+					}
+				}
+				else
+				{
+					m_bShouldFireShell = false;
+				}
+
+
+				/*Take delta = target - current (if it is negative, then add 360 until it is in the range 0 to 360)
+
+				Now if it is above 180 it is right, and if it is below 180 then it is left*/
+
+				/*int delta = th - angle;
+
+				if (delta < 0)
+				{
+					delta += 360;
+				}
+
+
+				if (th == angle)
+				{
+					m_bShouldFireShell = true;
+				}
+				else if (delta > 180)
+				{
+					turretGoRight();
+					m_bShouldFireShell = false;
+				}
+				else if (delta < 180)
+				{
+					turretGoLeft();
+					m_bShouldFireShell = false;
+				}
+				else
+				{
+					m_bShouldFireShell = false;
+				}*/
+
+				implementMove();
+
+			}
 		}
 		else
 		{
-			Astar.m_bHasFoundPath = false;
 			Astar.m_bGenerateNewPath = true;
+			Astar.m_bHasFoundEndCell = true;
 			Astar.m_pathTaken.clear();
 		}
 	}
@@ -217,5 +278,8 @@ void AI::score(int thisScore, int enemyScore)
 
 void AI::reset()
 {
+	Astar.m_bGenerateNewPath = true;
+	Astar.m_bHasFoundEndCell = true;
+	Astar.m_pathTaken.clear();
 	forwards = true;
 }

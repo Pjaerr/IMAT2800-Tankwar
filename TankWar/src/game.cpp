@@ -147,7 +147,7 @@ void Game::resetPlayer()
 		float th =(float) ( rand() % 359);
 		float tth = th;
 		player.resetTank(x,y,th,tth);
-		player.reset();
+		player.reset(); //< dON'T PUT HERE CHECK TO SEE IF NONE COLLISION FIRST, INITALL ONLY STOPPED FORWARDS BOOL NOT THIS
 
 		collision = false;
 		for (list<Obstacle>::iterator it = obstacles.begin(); it != obstacles.end(); ++it)
@@ -185,22 +185,20 @@ void Game::play()// Play the game for one timestep
 	// Move tank
 	player.markPos(); //Stores the previous position to help with collision correction.
 
+	player.m_setOpponentBoundingBox(npc.bb);
+
 	player.move(); //Moves this tank according to the pathfinding algorithm.
 
 
 	//Should a new path try to be found by the AI Tank, occurs when the it has found the previous path.
-	if (player.m_bChooseNewEndCell)
+	if (player.m_shouldChooseNewEndCell())
 	{	
 		//Grab the x and y position of the other tank within the grid.
 		int x = (npc.getX() / gridObj.m_widthScaled);
 		int y = (npc.getY() / gridObj.m_heightScaled);
 
 		player.m_setEndCell(&grid[x][y]); //Update the AI Tank's end goal.
-		
-		player.m_bChooseNewEndCell = false; //Tell the AI Tank to start searching.
 	}
-
-	player.m_enemyWithinRange(npc.getX(), npc.getY()); //TEMPORARY RADIUS DETECTION.
 
 	/*Set the AI Tank's current position within the grid.*/
 	for (int i = 0; i < grid.size(); i++)
@@ -216,6 +214,12 @@ void Game::play()// Play the game for one timestep
 			}
 		}
 	}
+
+	if (player.m_bShouldFireShell)
+	{
+		fireShell(player.firingPosition(), false);
+	}
+	
 
 	///#### AI TANK UPDATE CODE	 ####///
 
@@ -482,8 +486,6 @@ void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const// Draw 
 	}
 
 	target.draw(player);
-
-	target.draw(player.m_shootRadius);
 
 	target.draw(ammoArea);
 
