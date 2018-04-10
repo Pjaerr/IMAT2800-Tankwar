@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Cell.h"
+#include "Tank.h"
 
 class Grid
 {
@@ -34,4 +35,6 @@ public:
 	\param rows The number of rows in the grid.
 	*/
 	std::vector< std::vector<Cell> > m_createGrid(int cols, int rows);
+
+	bool isInCell(Tank &tank, Cell *cell);
 };

@@ -90,4 +90,13 @@ public:
 	
 	int x;
 	int y;
+
+	sf::ConvexShape raycastLine;
+	int m_iMaxDist = 240;
+
+	bool m_bRaycastHit(BoundingBox target);
+
+	bool m_bCanShootEnemy = false;
+
+	float anglee = 0;
 };

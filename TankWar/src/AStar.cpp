@@ -27,7 +27,8 @@ void AStar::cleanup()
 {
 	for (int i = m_closedSet.size() - 1; i >= 0; i--)
 	{
-		//m_closedSet.at(i)->setColour(sf::Color::Green);
+		m_closedSet.at(i)->m_bIsAnObstacle = false;
+		m_closedSet.at(i)->setColour(sf::Color::Green);
 		m_closedSet.at(i)->m_previousCell = nullptr;
 		m_closedSet.at(i) = nullptr;
 	}
@@ -36,7 +37,8 @@ void AStar::cleanup()
 
 	for (int i = m_openSet.size() - 1; i >= 0; i--)
 	{
-		//m_openSet.at(i)->setColour(sf::Color::Green);
+		m_openSet.at(i)->m_bIsAnObstacle = false;
+		m_openSet.at(i)->setColour(sf::Color::Green);
 		m_openSet.at(i)->m_previousCell = nullptr;
 		m_openSet.at(i) = nullptr;
 	}
@@ -159,7 +161,7 @@ void AStar::Run(Cell * currentTankPos)
 		m_removeFromOpenSet(m_currentCell);
 		m_closedSet.push_back(m_currentCell);
 
-		//m_currentCell->setColour(sf::Color::Red);
+		m_currentCell->setColour(sf::Color::Red);
 
 		//For every neighbour of the current cell.
 		for (int i = 0; i < m_currentCell->m_neighbours->size(); i++)
@@ -176,7 +178,7 @@ void AStar::Run(Cell * currentTankPos)
 				{
 					m_openSet.push_back(currentNeighbour); //Add it to the open set.
 
-					//currentNeighbour->setColour(sf::Color::Blue);
+					currentNeighbour->setColour(sf::Color::Blue);
 
 					//Set its g score to our temp g score.
 					currentNeighbour->m_iGeographicalScore = fTentativeGeoScore; 

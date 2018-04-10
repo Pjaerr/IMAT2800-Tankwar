@@ -66,6 +66,7 @@ Game::Game() // Constructor
 	blueBuildings.push_back(Obstacle(dx,dy+40,dx+20,dy+60,sf::Color(60,60,170)));
 	blueBuildings.push_back(Obstacle(dx+20,dy+40,dx+40,dy+60,sf::Color(40,40,170)));
 
+
 	resetNpc();
 	resetPlayer();
 
@@ -88,6 +89,61 @@ Game::Game() // Constructor
 	int y = (npc.getY() / gridObj.m_heightScaled);
 
 	player.m_setEndCell(&grid[x][y]); //Set the AI Tank's starting goal to be that in the grid.
+
+
+	for (int i = 0; i < obstacles.size(); i++)
+	{
+		if (obstacles.size() > i)
+		{
+			std::list<Obstacle>::iterator it = obstacles.begin();
+
+			std::advance(it, i);
+
+			int x = (it->bb.getX1() / gridObj.m_widthScaled);
+			int y = (it->bb.getY1() / gridObj.m_heightScaled);
+
+			if (x >= 0 && x <= 9 && y >= 0 && y <= 9)
+			{
+				grid[x][y].m_bIsAnObstacle = true;
+			}
+		}
+	}
+
+	for (int i = 0; i < redBuildings.size(); i++)
+	{
+		if (redBuildings.size() > i)
+		{
+			std::list<Obstacle>::iterator it = redBuildings.begin();
+
+			std::advance(it, i);
+
+			int x = (it->bb.getX1() / gridObj.m_widthScaled);
+			int y = (it->bb.getY1() / gridObj.m_heightScaled);
+
+			if (x >= 0 && x <= 9 && y >= 0 && y <= 9)
+			{
+				grid[x][y].m_bIsAnObstacle = true;
+			}
+		}
+	}
+
+	for (int i = 0; i < blueBuildings.size(); i++)
+	{
+		if (blueBuildings.size() > i)
+		{
+			std::list<Obstacle>::iterator it = blueBuildings.begin();
+
+			std::advance(it, i);
+
+			int x = (it->bb.getX1() / gridObj.m_widthScaled);
+			int y = (it->bb.getY1() / gridObj.m_heightScaled);
+
+			if (x >= 0 && x <= 9 && y >= 0 && y <= 9)
+			{
+				grid[x][y].m_bIsAnObstacle = true;
+			}
+		}
+	}
 
 	///#### GRID AND AI TANK CREATION ####///
 }
@@ -146,8 +202,9 @@ void Game::resetPlayer()
 		float y = (float) (rand() % 580 + 10);
 		float th =(float) ( rand() % 359);
 		float tth = th;
+		
 		player.resetTank(x,y,th,tth);
-		player.reset(); //< dON'T PUT HERE CHECK TO SEE IF NONE COLLISION FIRST, INITALL ONLY STOPPED FORWARDS BOOL NOT THIS
+		
 
 		collision = false;
 		for (list<Obstacle>::iterator it = obstacles.begin(); it != obstacles.end(); ++it)
@@ -176,6 +233,8 @@ void Game::resetPlayer()
 		}
 		if(player.bb.collision(npc.bb)) collision = true;
 	}
+
+	player.reset();
 }
 
 void Game::play()// Play the game for one timestep
@@ -196,7 +255,7 @@ void Game::play()// Play the game for one timestep
 		//Grab the x and y position of the other tank within the grid.
 		int x = (npc.getX() / gridObj.m_widthScaled);
 		int y = (npc.getY() / gridObj.m_heightScaled);
-
+		grid[x][y].m_bIsAnObstacle = false;
 		player.m_setEndCell(&grid[x][y]); //Update the AI Tank's end goal.
 	}
 
@@ -207,13 +266,14 @@ void Game::play()// Play the game for one timestep
 		{
 			if (player.m_currentTankPos != &grid[i][j])
 			{
-				if (player.isInCell(&grid[i][j]))
+				if (gridObj.isInCell(player, &grid[i][j]))
 				{
 					player.m_currentTankPos = &grid[i][j];
 				}
 			}
 		}
 	}
+
 
 	if (player.m_bShouldFireShell)
 	{
@@ -488,6 +548,10 @@ void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const// Draw 
 	target.draw(player);
 
 	target.draw(ammoArea);
+
+	target.draw(player.raycastLine);
+
+	
 
 	// Draw shells
 	for (list<Shell>::const_iterator it = shells.begin(); it != shells.end(); ++it)

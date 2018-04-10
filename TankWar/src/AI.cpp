@@ -19,6 +19,10 @@ AI::AI(Cell *startCell, Cell *topOfGrid)
 
 	//Store DFS top of grid here.
 
+	raycastLine.setPointCount(3);
+	raycastLine.setOutlineThickness(5);
+	raycastLine.setOutlineColor(sf::Color::Red);
+
 
 	resetTank(startCell->m_realWorldPos.x, startCell->m_realWorldPos.y, 0, 0); //Set the tanks position to the start cell's postion.
 }
@@ -63,6 +67,14 @@ void AI::m_setOpponentBoundingBox(BoundingBox bb)
 
 void AI::move()
 {
+	raycastLine.setPoint(0, sf::Vector2f(0, 0));
+	raycastLine.setPoint(1, sf::Vector2f(m_iMaxDist, 0));
+	raycastLine.setPoint(2, sf::Vector2f(0, 1));
+	raycastLine.setPosition(sf::Vector2f(firingPosition().getX(), firingPosition().getY()));
+
+	raycastLine.setRotation(turretTh);
+
+	m_bCanShootEnemy = m_bRaycastHit(opponentBB);
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
@@ -80,7 +92,7 @@ void AI::move()
 		{
 			Cell cellToMoveTo = Astar.m_pathTaken.at(Astar.m_pathTaken.size() - 2);
 
-			if (!canSee(opponentBB))
+			if (!canSee(opponentBB) || canSee(opponentBB))
 			{
 				float totalStepsX = cellToMoveTo.getPos().x - m_currentTankPos->getPos().x;
 				float totalStepsY = m_currentTankPos->getPos().y - cellToMoveTo.getPos().y;
@@ -113,22 +125,10 @@ void AI::move()
 				else if (delta > 180)
 				{
 					goRight();
-					currentBodyAngle++;
-
-					if (currentBodyAngle > 360)
-					{
-					currentBodyAngle = 0;
-					}
 				}
 				else if(delta < 180)
 				{
 					goLeft();
-					currentBodyAngle--;
-
-					if (currentBodyAngle < -360)
-					{
-					currentBodyAngle = 0;
-					}
 				}
 
 				if (*m_currentTankPos == cellToMoveTo)
@@ -143,88 +143,18 @@ void AI::move()
 			else
 			{
 				stop();
-				float totalStepsX = Astar.m_endCell->m_realWorldPos.x - m_currentTankPos->m_realWorldPos.x;
-				float totalStepsY = m_currentTankPos->m_realWorldPos.y - Astar.m_endCell->m_realWorldPos.y;
-
-				int stepsX;
-				int stepsY;
-
-				totalStepsX == 0 ? stepsX = 0 : stepsX = totalStepsX / abs(totalStepsX);
-				totalStepsY == 0 ? stepsY = 0 : stepsY = totalStepsY / abs(totalStepsY);
-
-				int angle = m_currentTankPos->calculateAngleToCell(stepsX, stepsY);
-
-				float angleToFace = atan2(Astar.m_endCell->m_realWorldPos.y - pos.getY(), Astar.m_endCell->m_realWorldPos.x - pos.getX());
-
-				angleToFace = RAD2DEG(angleToFace);
-
+				
 				int th = turretTh;
 
-				std::cout << "Our Angle: " << currentTurretAngle << std::endl;
-				std::cout << "Our Angle Corrected: " << currentTurretAngle + currentBodyAngle << std::endl;
-				std::cout << "Body Angle: " << currentBodyAngle << std::endl;
-				std::cout << "Angle: " << (int)angleToFace << std::endl;
-
-				if (currentTurretAngle == (int)angleToFace)
+				if (m_bCanShootEnemy)
 				{
 					m_bShouldFireShell = true;
-				}
-				else if (currentTurretAngle < (int)angleToFace)
-				{
-					turretGoRight();
-					currentTurretAngle++;
-
-					if (currentTurretAngle > 360)
-					{
-						currentTurretAngle = 0;
-					}
-				}
-				else if (currentTurretAngle > (int)angleToFace)
-				{
-					turretGoLeft();
-					currentTurretAngle--;
-
-					if (currentTurretAngle < -360)
-					{
-						currentTurretAngle = 0;
-					}
 				}
 				else
-				{
-					m_bShouldFireShell = false;
-				}
-
-
-				/*Take delta = target - current (if it is negative, then add 360 until it is in the range 0 to 360)
-
-				Now if it is above 180 it is right, and if it is below 180 then it is left*/
-
-				/*int delta = th - angle;
-
-				if (delta < 0)
-				{
-					delta += 360;
-				}
-
-
-				if (th == angle)
-				{
-					m_bShouldFireShell = true;
-				}
-				else if (delta > 180)
 				{
 					turretGoRight();
 					m_bShouldFireShell = false;
 				}
-				else if (delta < 180)
-				{
-					turretGoLeft();
-					m_bShouldFireShell = false;
-				}
-				else
-				{
-					m_bShouldFireShell = false;
-				}*/
 
 				implementMove();
 
@@ -237,6 +167,23 @@ void AI::move()
 			Astar.m_pathTaken.clear();
 		}
 	}
+}
+
+bool AI::m_bRaycastHit(BoundingBox target)
+{
+	BoundingBox line;
+
+	line.set(raycastLine.getPosition().x, raycastLine.getPosition().y, raycastLine.getPosition().x + raycastLine.getGlobalBounds().width, raycastLine.getPosition().y + raycastLine.getGlobalBounds().height);
+
+	if (target.collision(line))
+	{
+		std::cout << "TRUE" << std::endl;
+		raycastLine.setOutlineColor(sf::Color::Blue);
+		return true;
+	}
+
+	raycastLine.setOutlineColor(sf::Color::Red);
+	return false;
 }
 
 
@@ -282,4 +229,7 @@ void AI::reset()
 	Astar.m_bHasFoundEndCell = true;
 	Astar.m_pathTaken.clear();
 	forwards = true;
+
+	pos.set(pos.getX(), pos.getY(), 0);
+
 }

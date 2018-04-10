@@ -68,3 +68,11 @@ std::vector< std::vector<Cell> > Grid::m_createGrid(int cols, int rows)
 
 	return grid;
 }
+
+bool Grid::isInCell(Tank &tank, Cell *cell)
+{
+	return ((int)tank.getX() >= cell->getPos().x * cell->m_widthScaled &&
+		(int)tank.getX() <= (cell->getPos().x * cell->m_widthScaled) + cell->m_widthScaled - 1 &&
+		(int)tank.getY() >= cell->getPos().y * cell->m_heightScaled &&
+		(int)tank.getY() <= (cell->getPos().y * cell->m_heightScaled) + cell->m_heightScaled - 1);
+}
