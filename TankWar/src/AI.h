@@ -2,18 +2,22 @@
 
 #include "aitank.h"
 #include "Cell.h"
-#include "AStar.h"
+#include "Astar.h"
 #include "BFS.h"
 #include "DFS.h"
 
 /* \class This is the class we will work in. Every algorithm should be implemented using the grid in the Game class via
 this class.*/
+
+template <class T>
 class AI : public AITank
 {
 private:
 	AStar Astar; //!< Reference to the AStar object.
 	BFS BreadthFirstSearch; //!< Reference to the BFS object.
 	DFS DepthFirstSearch; //!< Reference to the DFS object.
+
+	T algorithm;
 
 	bool forwards; //!< Is the tank moving forwards?
 
@@ -42,6 +46,8 @@ public:
 
 	float currentTurretAngle = 0;
 	float currentBodyAngle = 0;
+
+	bool m_bcanSeeBase = false;
 
 	Cell * m_currentTankPos = nullptr; //!< The position of this tank within the grid.
 
@@ -91,12 +97,5 @@ public:
 	int x;
 	int y;
 
-	sf::ConvexShape raycastLine;
-	int m_iMaxDist = 240;
-
-	bool m_bRaycastHit(BoundingBox target);
-
 	bool m_bCanShootEnemy = false;
-
-	float anglee = 0;
 };

@@ -5,6 +5,21 @@ DFS::DFS()
 {
 }
 
+void DFS::m_setCurrentCell(Cell * newCurrentCell)
+{
+	//m_currentCell = newCurrentCell;
+}
+
+void DFS::m_setEndCell(Cell * newEndCell)
+{
+	m_endCell = newEndCell;
+}
+
+void DFS::m_setTopOfGrid(Cell * topOfGrid)
+{
+	m_topOfGrid = topOfGrid;
+}
+
 /*! Clears all of the data structures that were used when finding the most
 *	recent path.
 */
@@ -25,17 +40,18 @@ void DFS::cleanup()
 /*! Finds a path to the end cell by travering the top left corner of the grid from
 *	left to right until it finds the end cell.
 */
-void DFS::Run()
+void DFS::Run(Cell * currentTankPos)
 {
 	//If no cells have been checked yet.
 	if (m_visitedCells.empty())
 	{
 		//Evaluate the top left corner of the grid first.
 		m_currentCell = m_topOfGrid;
+		m_cellsToCheck.push(m_currentCell);
 	}
 
 	//Whilst we still haven't found the end cell.
-	if (!m_bHasFoundPath)
+	if (!m_cellsToCheck.empty())
 	{
 		m_currentCell->setColour(sf::Color::Red);
 
@@ -65,14 +81,19 @@ void DFS::Run()
 					m_currentCell->setColour(sf::Color::Yellow);
 
 
-					//** STORE PATH TAKEN HERE.
+					if (m_bGenerateNewPath)
+					{
+						for (int i = 0; i < m_visitedCells.size(); i++)
+						{
+							m_pathTaken.push_back(*m_visitedCells.at(i));
+						}
 
+						m_visitedCells.clear();
 
-					m_bHasFoundPath = true;
+						m_bHasFoundPath = true; //We can start moving the tank.
+					}
 
 					m_bChooseNewEndCell = true;
-
-					m_previousEndCell = m_endCell; //**REPLACE IN FAVOUR OF A PATH.
 
 					m_currentCell = m_topOfGrid;
 

@@ -82,13 +82,13 @@ Game::Game() // Constructor
 	grid = gridObj.m_createGrid(10, 10);
 
 	/*Initialise the AI tank, giving it a starting Cell in the grid of [1][4]. Or the second column, fifth row.*/
-	player = AI(&grid[2][4], &grid[0][0]); //PLAYER IS AI FOR TESTING, WON'T BE PLAYER IN ACTUAL IMPLEMENTATION.
+	npc = AI<AStar>(&grid[2][4], &grid[0][0]); //PLAYER IS AI FOR TESTING, WON'T BE PLAYER IN ACTUAL IMPLEMENTATION.
 
 	//Grab the x and y of the other tank and convert it to a position in grid space.
-	int x = (npc.getX() / gridObj.m_widthScaled);
-	int y = (npc.getY() / gridObj.m_heightScaled);
+	int x = (player.getX() / gridObj.m_widthScaled);
+	int y = (player .getY() / gridObj.m_heightScaled);
 
-	player.m_setEndCell(&grid[x][y]); //Set the AI Tank's starting goal to be that in the grid.
+	npc.m_setEndCell(&grid[x][y]); //Set the AI Tank's starting goal to be that in the grid.
 
 
 	for (int i = 0; i < obstacles.size(); i++)
@@ -161,7 +161,7 @@ void Game::resetNpc()
 		float th = (float) (rand() % 359);
 		float tth = th;
 		npc.resetTank(x,y,th,tth);
-		npc.reset();
+		
 
 		collision = false;
 		for (list<Obstacle>::iterator it = obstacles.begin(); it != obstacles.end(); ++it)
@@ -190,6 +190,8 @@ void Game::resetNpc()
 		}
 		if(npc.bb.collision(player.bb)) collision = true;
 	}
+
+	npc.reset();
 }
 
 // Set a random Position which does not collide with anything
@@ -244,19 +246,19 @@ void Game::play()// Play the game for one timestep
 	// Move tank
 	player.markPos(); //Stores the previous position to help with collision correction.
 
-	player.m_setOpponentBoundingBox(npc.bb);
+	npc.m_setOpponentBoundingBox(player.bb);
 
-	player.move(); //Moves this tank according to the pathfinding algorithm.
+	npc.move(); //Moves this tank according to the pathfinding algorithm.
 
 
 	//Should a new path try to be found by the AI Tank, occurs when the it has found the previous path.
-	if (player.m_shouldChooseNewEndCell())
+	if (npc.m_shouldChooseNewEndCell())
 	{	
 		//Grab the x and y position of the other tank within the grid.
-		int x = (npc.getX() / gridObj.m_widthScaled);
-		int y = (npc.getY() / gridObj.m_heightScaled);
+		int x = (player.getX() / gridObj.m_widthScaled);
+		int y = (player.getY() / gridObj.m_heightScaled);
 		grid[x][y].m_bIsAnObstacle = false;
-		player.m_setEndCell(&grid[x][y]); //Update the AI Tank's end goal.
+		npc.m_setEndCell(&grid[x][y]); //Update the AI Tank's end goal.
 	}
 
 	/*Set the AI Tank's current position within the grid.*/
@@ -264,20 +266,20 @@ void Game::play()// Play the game for one timestep
 	{
 		for (int j = 0; j < grid[0].size(); j++)
 		{
-			if (player.m_currentTankPos != &grid[i][j])
+			if (npc.m_currentTankPos != &grid[i][j])
 			{
-				if (gridObj.isInCell(player, &grid[i][j]))
+				if (gridObj.isInCell(npc, &grid[i][j]))
 				{
-					player.m_currentTankPos = &grid[i][j];
+					npc.m_currentTankPos = &grid[i][j];
 				}
 			}
 		}
 	}
 
 
-	if (player.m_bShouldFireShell)
+	if (npc.m_bShouldFireShell)
 	{
-		fireShell(player.firingPosition(), false);
+		fireShell(npc.firingPosition(), true);
 	}
 	
 
@@ -313,13 +315,18 @@ void Game::play()// Play the game for one timestep
 	
 	if(player.bb.collision(npc.bb)) collision = true;
 
-	if(collision)player.recallPos();
+	if (collision)
+	{
+		player.recallPos();
+		
+	}
 
 
 	// Move AI tank
-	npc.markPos();
-	npc.move();
-	npc.implementMove();
+	player.markPos();
+	player.move();
+	player.implementMove();
+	
 	if(npc.isFiring()){fireShell(npc.firingPosition(), true);}
 
 	// Check for collisions
@@ -353,8 +360,8 @@ void Game::play()// Play the game for one timestep
 
 	if(collision)
 	{
-		npc.recallPos();
-		npc.collided();
+		//npc.recallPos();
+		//npc.collided();
 	}
 
 	// Check if AI Tank can see anything
@@ -487,7 +494,11 @@ void Game::play()// Play the game for one timestep
 
 	for (list<Obstacle>::iterator it = redBuildings.begin(); it != redBuildings.end(); ++it)
 	{
-		if(player.canSee(it->bb)) it->setVisible();
+		if (player.canSee(it->bb))
+		{
+			it->setVisible();
+		}
+		
 	}
 
 	for (list<Obstacle>::iterator it = blueBuildings.begin(); it != blueBuildings.end(); ++it)
@@ -549,9 +560,6 @@ void Game::draw(sf::RenderTarget &target, sf::RenderStates states) const// Draw 
 
 	target.draw(ammoArea);
 
-	target.draw(player.raycastLine);
-
-	
 
 	// Draw shells
 	for (list<Shell>::const_iterator it = shells.begin(); it != shells.end(); ++it)
@@ -657,33 +665,31 @@ void Game::keyPressed(sf::Keyboard::Key key)
 	{
 	   case	sf::Keyboard::Tab :
 		   debugMode = !debugMode;
-		   /*player.toggleDebugMode();
-		   npc.toggleDebugMode();*/
 		   for (list<Shell>::iterator it = shells.begin(); it != shells.end(); ++it){it->toggleDebugMode();}
 		   break;
 	   case  sf::Keyboard::W : 
-		   //player.goForward();
+		   player.goForward();
 		   break;
 	   case  sf::Keyboard::A : 
-		   //player.goLeft();
+		   player.goLeft();
 		   break;
 	   case  sf::Keyboard::S : 
-		   //player.goBackward();
+		   player.goBackward();
 		   break;
 	   case  sf::Keyboard::D : 
-		   //player.goRight();
+		   player.goRight();
 		   break;
 	   case	sf::Keyboard::Space :
-		   /*if(player.canFire())
+		   if(player.canFire())
 		   {
 			fireShell(player.firingPosition(), false);
-		   }*/
+		   }
 		   break;
 	   case  sf::Keyboard::Left:
-		   //player.turretGoLeft();
+		   player.turretGoLeft();
 		   break;
 	   case  sf::Keyboard::Right:
-		   //player.turretGoRight();
+		   player.turretGoRight();
 		   break;
 	}
 }
@@ -693,22 +699,22 @@ void Game::keyReleased(sf::Keyboard::Key key)
 	switch(key)
 	{
 	   case  sf::Keyboard::W : 
-		   //player.stop();
+		   player.stop();
 		   break;
 	   case  sf::Keyboard::A : 
-		   //player.stop();
+		   player.stop();
 		   break;
 	   case  sf::Keyboard::S : 
-		   //player.stop();
+		   player.stop();
 		   break;
 	   case  sf::Keyboard::D : 
-		   //player.stop();
+		   player.stop();
 		   break;
 	   case  sf::Keyboard::Left:
-		   //player.stopTurret();
+		   player.stopTurret();
 		   break;
 	   case  sf::Keyboard::Right:
-		   //player.stopTurret();
+		   player.stopTurret();
 		   break;
 	}
 }

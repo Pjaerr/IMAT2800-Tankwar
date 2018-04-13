@@ -1,4 +1,4 @@
-#include "AStar.h"
+#include "Astar.h"
 
 /*! The default constructor.*/
 AStar::AStar()
@@ -18,6 +18,10 @@ void AStar::m_setEndCell(Cell * newEndCell)
 
 	m_currentCell->calculateHeuScore(m_endCell);
 	m_currentCell->m_fFinalScore = m_currentCell->m_fHeuristicScore;
+}
+
+void AStar::m_setTopOfGrid(Cell * topOfGrid)
+{
 }
 
 /*! Clears all of the data structures that were used when finding the most

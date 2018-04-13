@@ -2,6 +2,7 @@
 
 #include "Cell.h"
 #include <stack>
+#include <iostream> 
 
 class DFS
 {
@@ -9,6 +10,7 @@ public:
 	bool m_bHasFoundEndCell = false; //!< True if the tank is within the end cell.
 	bool m_bHasFoundPath = false; //!< True if the algorithm has found the end cell.
 	bool m_bChooseNewEndCell = false; //!< True if the algorithm needs a new end cell from Game.cpp.
+	bool m_bGenerateNewPath = true;
 
 	int m_iNeighbourToCheck = 0; //!< The index of the neighbour that needs to be checked next.
 
@@ -24,7 +26,24 @@ public:
 	/*! \brief The function that should be called to allow the algorithm to find a path.
 	*	\param currentTankPos The Cell the tank is inside of.
 	*/
-	void Run();
+	void Run(Cell * currentTankPos);
+
+	/*! Sets the current cell this tank is, or will be evaluting and/or moving towards if not already there.
+
+	Changes the previous current cell and all of its neighbours, if they exist, to white and then
+	sets the current cell to the given cell pointer and then changes it, and all of its neighbours, to red.
+
+	\param newCurrentCell A pointer to the new current Cell the tank will be evaluating next.
+	*/
+	void m_setCurrentCell(Cell * newCurrentCell);
+
+	/*! Sets the end Cell to the given Cell pointer.
+
+	\param newEndCell A pointer to the new cell this tank will try to reach.
+	*/
+	void m_setEndCell(Cell * newEndCell);
+
+	void m_setTopOfGrid(Cell * topOfGrid);
 
 private:
 	std::vector<Cell*> m_visitedCells; //!< Cells that are no longer needed.

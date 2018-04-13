@@ -11,6 +11,7 @@
 
 #include "Grid.h"
 #include "AI.h"
+#include "AI.cpp"
 
 using namespace std;
 
@@ -35,8 +36,8 @@ class Game : public sf::Drawable
 		~Game(); // Destructor
 		virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const; // Draw the game
 		void play(); // Play the game for one timestep
-		DumbTank npc; // Red tank
-		AI player; // Blue tank
+		AI<AStar> npc; // Red tank
+		PlayerTank player; // Blue tank
 		void keyPressed(sf::Keyboard::Key key); // function for processing input
 		void keyReleased(sf::Keyboard::Key key); // function for processing input
 		bool gameOver() const; // Has the game finished?

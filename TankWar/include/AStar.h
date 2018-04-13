@@ -38,6 +38,8 @@ public:
 	*/
 	void m_setEndCell(Cell * newEndCell);
 
+	void m_setTopOfGrid(Cell * topOfGrid);
+
 private:
 	std::vector<Cell*> m_openSet; //!< Collection of Cells that are to be evaluated.
 	std::vector<Cell*> m_closedSet; //!< Collection of Cells that are no longer needed.
